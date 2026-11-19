@@ -28,10 +28,22 @@ npm run dev
 
 `npm run dev` เริ่ม Frontend ที่ Vite และ Backend ที่พอร์ต `3001` พร้อมกัน โดย Vite proxy `/api` ไปยัง Backend
 
+## Deploy บน Vercel
+
+โปรเจกต์มี Vercel Functions ใน `api/` สำหรับ `/api/stops`, `/api/routes` และ `/api/health` ส่วนการเชื่อม Neon ใช้ `DATABASE_URL` ฝั่ง server เท่านั้น
+
+1. Import repository นี้ใน Vercel โดยใช้ repository root เป็น Root Directory
+2. ใน **Project Settings → Environment Variables** เพิ่ม `DATABASE_URL` ด้วย connection string จาก Neon ที่มี `sslmode=require` เลือก environment ที่ต้องการใช้ (เช่น Production)
+3. กด Redeploy เพื่อให้ Functions เริ่มทำงานด้วย environment variable ใหม่
+4. ทดสอบ `<deployment-url>/api/health` ต้องได้ `{"status":"ok","database":"connected"}` แล้วเปิดหน้าเว็บเพื่อตรวจข้อมูล
+
+อย่าใส่ `DATABASE_URL` ในตัวแปร `VITE_*` เพราะตัวแปรเหล่านั้นถูกส่งไปยัง browser และห้าม commit connection string ลง Git
+
 ## โครงสร้าง
 
 - `Frontend/` — React UI, API client, hooks และ components
 - `Backend/` — Express app, routes, controllers, repositories และ PostgreSQL connection
+- `api/` — Vercel Functions สำหรับ API production
 - `Database/schema.sql` — schema ตารางสำหรับ Neon PostgreSQL
 
 API แบบอ่านอย่างเดียว:
