@@ -3,8 +3,7 @@ import { authHandlers } from "../controllers/auth/handlers.js";
 
 const router = Router();
 
-router.post("/auth/register/start", authHandlers.startRegistration);
-router.post("/auth/register/verify", authHandlers.verifyRegistration);
+router.post("/auth/register", authHandlers.register);
 router.post("/auth/login", authHandlers.login);
 router.get("/auth/me", authHandlers.currentUser);
 router.post("/auth/logout", authHandlers.logout);

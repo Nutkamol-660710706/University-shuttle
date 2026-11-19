@@ -25,12 +25,8 @@ export function logout() {
   return request("/api/auth/logout", { method: "POST", body: {} });
 }
 
-export function startRegistration(data) {
-  return request("/api/auth/register/start", { method: "POST", body: data });
-}
-
-export function verifyRegistration(data) {
-  return request("/api/auth/register/verify", { method: "POST", body: data });
+export function register(data) {
+  return request("/api/auth/register", { method: "POST", body: data });
 }
 
 export function startPasswordReset(data) {

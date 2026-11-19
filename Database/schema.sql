@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS users (
     gender IN ('male', 'female', 'other', 'prefer_not_to_say')
   ),
   phone_e164 VARCHAR(16) NOT NULL UNIQUE,
-  phone_verified_at TIMESTAMPTZ NOT NULL,
+  phone_verified_at TIMESTAMPTZ,
   auth_version INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS users (
 
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS auth_version INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE users
+  ALTER COLUMN phone_verified_at DROP NOT NULL;
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_username_lower_key
   ON users (lower(username));

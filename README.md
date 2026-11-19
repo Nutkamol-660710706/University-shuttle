@@ -6,7 +6,7 @@
 
 1. คัดลอก `.env.example` เป็น `.env`
 2. ใน Neon Console เลือก **Connect** แล้วคัดลอก connection string ของ Node.js ที่มี `sslmode=require` ใส่ใน `DATABASE_URL` ของ `.env`
-3. สร้าง Verify Service ใน Twilio Console แล้วตั้ง `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` และ `TWILIO_VERIFY_SERVICE_SID`
+3. หากต้องการเปิดกู้รหัสผ่านทาง SMS ให้สร้าง Verify Service ใน Twilio Console แล้วตั้ง `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` และ `TWILIO_VERIFY_SERVICE_SID` (สมัครและเข้าสู่ระบบไม่ต้องใช้ Twilio)
 4. สร้าง `AUTH_SECRET` แบบสุ่มอย่างน้อย 32 bytes (เช่น `openssl rand -base64 48`)
 5. เก็บ `.env` ไว้ในเครื่องหรือ secret manager เท่านั้น ห้าม commit หรือส่ง secret ในแชต
 
@@ -17,6 +17,7 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST/DB_NAME?sslmode=require
 API_HOST=127.0.0.1
 API_PORT=3001
 AUTH_SECRET=<random-secret>
+# ตั้งค่าเฉพาะเมื่อเปิดกู้รหัสผ่านทาง SMS
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=<twilio-auth-token>
 TWILIO_VERIFY_SERVICE_SID=VA...
@@ -41,7 +42,7 @@ Schema ยังสร้างตาราง `users`, `auth_sms_rate_limits` �
 โปรเจกต์มี Vercel Functions ใน `api/` สำหรับแผนที่และสมาชิก ส่วนการเชื่อม Neon ใช้ `DATABASE_URL` ฝั่ง server เท่านั้น
 
 1. Import repository นี้ใน Vercel โดยใช้ repository root เป็น Root Directory
-2. ใน **Project Settings → Environment Variables** เพิ่ม `DATABASE_URL`, `AUTH_SECRET`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` และ `TWILIO_VERIFY_SERVICE_SID` เลือก environment ที่ต้องการใช้ (เช่น Production) ใช้ `AUTH_SECRET` และ Twilio credentials ชุดเดียวกันทุก deployment ที่ต้องการให้ cookie/session ทำงานต่อเนื่อง
+2. ใน **Project Settings → Environment Variables** เพิ่ม `DATABASE_URL` และ `AUTH_SECRET` (จำเป็นสำหรับสมัคร/เข้าสู่ระบบ) ส่วน `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` และ `TWILIO_VERIFY_SERVICE_SID` เป็นตัวเลือกและจำเป็นเฉพาะเมื่อเปิดกู้รหัสผ่านทาง SMS เลือก environment ที่ต้องการใช้ (เช่น Production) ใช้ `AUTH_SECRET` ชุดเดียวกันทุก deployment ที่ต้องการให้ cookie/session ทำงานต่อเนื่อง
 3. กด Redeploy เพื่อให้ Functions เริ่มทำงานด้วย environment variable ใหม่
 4. ทดสอบ `<deployment-url>/api/health` ต้องได้ `{"status":"ok","database":"connected"}` แล้วเปิดหน้าเว็บเพื่อตรวจข้อมูล
 
@@ -60,9 +61,9 @@ API แบบอ่านอย่างเดียว:
 - `GET /api/routes`
 - `GET /api/health`
 
-ระบบสมาชิกใช้ Username/Password, ยืนยันเบอร์โทรผ่าน SMS OTP ตอนสมัครและตอนกู้รหัสผ่าน และ session เก็บใน HttpOnly cookie:
+ระบบสมาชิกใช้ Username/Password สมัครและเข้าสู่ระบบได้โดยไม่ต้องใช้ OTP เบอร์โทรที่สมัครจะยังไม่ถือว่ายืนยันแล้ว ส่วนการกู้รหัสผ่านยังต้องยืนยัน SMS OTP และตั้งค่าผู้ให้บริการ SMS ก่อน; session เก็บใน HttpOnly cookie:
 
-- `POST /api/auth/register/start`, `POST /api/auth/register/verify`
+- `POST /api/auth/register`
 - `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`
 - `POST /api/auth/password-reset/start`, `POST /api/auth/password-reset/verify`
 

@@ -1,45 +1,19 @@
 import bcrypt from "bcryptjs";
-import {
-  createUser,
-  findUserByPhone,
-} from "../../repositories/userRepository.js";
+import { createUser } from "../../repositories/userRepository.js";
 import { AuthError } from "../../services/authErrors.js";
 import {
   assertSessionConfigured,
   setSessionCookie,
 } from "../../services/authSession.js";
 import {
-  normalizePhone,
   validatePassword,
   validateProfile,
-  validateVerificationCode,
 } from "../../services/authValidation.js";
-import {
-  sendVerificationCode,
-  verifyCode,
-} from "../../services/smsVerification.js";
 
-const registrationMessage = "หากเบอร์นี้ยังสมัครได้ ระบบได้ส่ง OTP ให้แล้ว";
-
-export async function startRegistration(request) {
-  assertSessionConfigured();
-  const phone = normalizePhone(request.body?.phone);
-  const existingUser = await findUserByPhone(phone);
-  if (!existingUser) {
-    await sendVerificationCode(phone, "registration", request);
-  }
-  return { message: registrationMessage };
-}
-
-export async function verifyRegistration(request, response) {
+export async function register(request, response) {
   assertSessionConfigured();
   const profile = validateProfile(request.body);
   const password = validatePassword(request.body?.password);
-  const code = validateVerificationCode(request.body?.code);
-
-  if (!(await verifyCode(profile.phone, code))) {
-    throw new AuthError(400, "OTP ไม่ถูกต้องหรือหมดอายุ");
-  }
 
   let user;
   try {

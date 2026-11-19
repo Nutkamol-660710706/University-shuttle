@@ -50,9 +50,8 @@ export default function AuthDialog({
         )}
         {mode === "register" && (
           <RegisterForm
-            onStart={auth.startRegistration}
-            onVerify={async (details) => {
-              await auth.completeRegistration(details);
+            onRegister={async (details) => {
+              await auth.register(details);
               onClose();
             }}
             onLogin={() => switchMode("login")}

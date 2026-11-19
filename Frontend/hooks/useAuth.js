@@ -30,8 +30,8 @@ export function useAuth() {
     return result.user;
   }, []);
 
-  const completeRegistration = useCallback(async (details) => {
-    const result = await authApi.verifyRegistration(details);
+  const register = useCallback(async (details) => {
+    const result = await authApi.register(details);
     setUser(result.user);
     return result.user;
   }, []);
@@ -46,8 +46,7 @@ export function useAuth() {
     isLoading,
     signIn,
     signOut,
-    startRegistration: authApi.startRegistration,
-    completeRegistration,
+    register,
     startPasswordReset: authApi.startPasswordReset,
     verifyPasswordReset: authApi.verifyPasswordReset,
   };

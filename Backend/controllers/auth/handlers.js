@@ -1,8 +1,5 @@
 import { createAuthHandler } from "./authHandler.js";
-import {
-  startRegistration,
-  verifyRegistration,
-} from "./registrationController.js";
+import { register } from "./registrationController.js";
 import {
   getCurrentUser,
   login,
@@ -14,8 +11,7 @@ import {
 } from "./passwordResetController.js";
 
 export const authHandlers = {
-  startRegistration: createAuthHandler("POST", startRegistration),
-  verifyRegistration: createAuthHandler("POST", verifyRegistration),
+  register: createAuthHandler("POST", register),
   login: createAuthHandler("POST", login),
   currentUser: createAuthHandler("GET", getCurrentUser),
   logout: createAuthHandler("POST", logout),

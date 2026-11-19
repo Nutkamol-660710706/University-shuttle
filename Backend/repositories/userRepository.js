@@ -65,7 +65,7 @@ export async function createUser(user) {
        phone_e164,
        phone_verified_at
      )
-     VALUES ($1, $2, $3, $4, $5, $6, now())
+     VALUES ($1, $2, $3, $4, $5, $6, NULL)
      RETURNING ${publicUserFields}, auth_version AS "authVersion"`,
     [
       user.username,
@@ -82,8 +82,11 @@ export async function createUser(user) {
 export async function updatePasswordByPhone(phone, passwordHash) {
   const { rowCount } = await pool.query(
     `UPDATE users
-     SET password_hash = $2, auth_version = auth_version + 1, updated_at = now()
-     WHERE phone_e164 = $1 AND phone_verified_at IS NOT NULL`,
+     SET password_hash = $2,
+         phone_verified_at = COALESCE(phone_verified_at, now()),
+         auth_version = auth_version + 1,
+         updated_at = now()
+     WHERE phone_e164 = $1`,
     [phone, passwordHash],
   );
   return rowCount > 0;
