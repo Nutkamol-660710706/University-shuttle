@@ -1,9 +1,12 @@
 import express from "express";
+import authRoutes from "./routes/authRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import tramRoutes from "./routes/tramRoutes.js";
 
 const app = express();
 
+app.use(express.json({ limit: "10kb" }));
+app.use("/api", authRoutes);
 app.use("/api", healthRoutes);
 app.use("/api", tramRoutes);
 app.use("/api", (_request, response) => {
