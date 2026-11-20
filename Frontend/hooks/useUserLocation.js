@@ -57,41 +57,6 @@ export function useUserLocation(userId) {
     }
   }, []);
 
-  useEffect(() => {
-    let active = true;
-    stopTracking();
-    setLocation(null);
-    setError("");
-
-    if (!userId) {
-      setIsLoading(false);
-      return () => {
-        active = false;
-      };
-    }
-
-    setIsLoading(true);
-    locationApi
-      .getMyLocation()
-      .then(({ location: savedLocation }) => {
-        if (active) setLocation(savedLocation);
-      })
-      .catch((loadError) => {
-        if (active) {
-          console.error("Unable to load saved user location:", loadError);
-          setError(loadError.message);
-        }
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-
-    return () => {
-      active = false;
-      stopTracking();
-    };
-  }, [stopTracking, userId]);
-
   const startTracking = useCallback(() => {
     if (!userId) {
       setError("กรุณาเข้าสู่ระบบก่อนบันทึกตำแหน่ง");
@@ -148,6 +113,43 @@ export function useUserLocation(userId) {
       setError(trackingError.message || "เริ่มติดตามตำแหน่งไม่สำเร็จ");
     }
   }, [stopTracking, uploadLatestPosition, userId]);
+
+  useEffect(() => {
+    let active = true;
+    stopTracking();
+    setLocation(null);
+    setError("");
+
+    if (!userId) {
+      setIsLoading(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    setIsLoading(true);
+    locationApi
+      .getMyLocation()
+      .then(({ location: savedLocation }) => {
+        if (active) setLocation(savedLocation);
+      })
+      .catch((loadError) => {
+        if (active) {
+          console.error("Unable to load saved user location:", loadError);
+          setError(loadError.message);
+        }
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+
+    startTracking();
+
+    return () => {
+      active = false;
+      stopTracking();
+    };
+  }, [startTracking, stopTracking, userId]);
 
   const clearSavedLocation = useCallback(async () => {
     if (isTracking) {

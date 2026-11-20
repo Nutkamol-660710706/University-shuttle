@@ -95,7 +95,7 @@ export default function MapWorkspace({
             type="button"
           >
             <LocateFixed size={14} />
-            เริ่มติดตาม
+            เริ่มอีกครั้ง
           </button>
         )}
         {userLocation && !isLocationTracking && (
@@ -115,7 +115,7 @@ export default function MapWorkspace({
           </small>
         )}
         <small className="location-sharing-note">
-          กดเริ่มเพื่อแชร์พิกัดใหม่สูงสุดทุก 30 วินาที ไม่มีประวัติเส้นทาง และลบได้
+          หลังเข้าสู่ระบบจะขออนุญาตและเริ่มติดตามอัตโนมัติ อัปเดตสูงสุดทุก 30 วินาที หยุดหรือลบได้
         </small>
       </div>
 
