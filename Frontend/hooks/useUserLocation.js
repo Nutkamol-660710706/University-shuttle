@@ -170,7 +170,6 @@ export function useUserLocation(userId) {
     isTracking,
     isLoading,
     error,
-    startTracking,
     stopTracking,
     clearSavedLocation,
   };

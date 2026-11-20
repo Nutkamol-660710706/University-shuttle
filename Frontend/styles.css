@@ -732,6 +732,12 @@ button {
   cursor: not-allowed;
 }
 
+.location-tracking-state {
+  color: #829197;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
 .location-tracking-button.is-tracking {
   border-color: #f0dfd9;
   background: #fff3ef;

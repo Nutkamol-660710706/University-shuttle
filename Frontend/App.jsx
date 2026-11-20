@@ -108,7 +108,6 @@ function App() {
           isLocationTracking={userLocation.isTracking}
           isLocationLoading={userLocation.isLoading}
           locationError={userLocation.error}
-          onStartLocationTracking={userLocation.startTracking}
           onStopLocationTracking={userLocation.stopTracking}
           onClearSavedLocation={userLocation.clearSavedLocation}
         />

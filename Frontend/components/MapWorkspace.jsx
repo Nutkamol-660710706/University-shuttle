@@ -1,6 +1,5 @@
 import {
   Clock3,
-  LocateFixed,
   MapPin,
   Menu,
   Navigation,
@@ -27,7 +26,6 @@ export default function MapWorkspace({
   isLocationTracking,
   isLocationLoading,
   locationError,
-  onStartLocationTracking,
   onStopLocationTracking,
   onClearSavedLocation,
 }) {
@@ -69,14 +67,14 @@ export default function MapWorkspace({
             {!isAuthenticated
               ? isAuthLoading
                 ? "กำลังตรวจสอบบัญชี..."
-                : "เข้าสู่ระบบเพื่อบันทึกตำแหน่ง"
+                : "เข้าสู่ระบบเพื่อเริ่มติดตามอัตโนมัติ"
               : isLocationTracking
                 ? "กำลังติดตาม · อัปเดตสูงสุดทุก 30 วินาที"
                 : isLocationLoading
                   ? "กำลังโหลดตำแหน่งล่าสุด..."
                   : userLocation?.updatedAt
                     ? `บันทึกล่าสุด ${new Date(userLocation.updatedAt).toLocaleString("th-TH")}`
-                    : "ยังไม่มีตำแหน่งที่บันทึก"}
+                    : "ยังไม่ได้รับตำแหน่ง"}
           </small>
         </div>
         {isLocationTracking ? (
@@ -88,15 +86,9 @@ export default function MapWorkspace({
             หยุดติดตาม
           </button>
         ) : (
-          <button
-            className="location-tracking-button"
-            onClick={onStartLocationTracking}
-            disabled={!isAuthenticated || isAuthLoading}
-            type="button"
-          >
-            <LocateFixed size={14} />
-            เริ่มอีกครั้ง
-          </button>
+          <span className="location-tracking-state">
+            {isAuthenticated ? "ไม่ติดตามอยู่" : "เฉพาะสมาชิก"}
+          </span>
         )}
         {userLocation && !isLocationTracking && (
           <button
@@ -115,7 +107,7 @@ export default function MapWorkspace({
           </small>
         )}
         <small className="location-sharing-note">
-          หลังเข้าสู่ระบบจะขออนุญาตและเริ่มติดตามอัตโนมัติ อัปเดตสูงสุดทุก 30 วินาที หยุดหรือลบได้
+          เฉพาะสมาชิกที่เข้าสู่ระบบ ระบบจะขออนุญาตและเริ่มติดตามอัตโนมัติ หยุดหรือลบตำแหน่งได้
         </small>
       </div>
 
