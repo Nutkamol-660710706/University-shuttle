@@ -7,6 +7,7 @@ import {
   TrainFront,
 } from "lucide-react";
 import TramMap from "./TramMap.jsx";
+import { demoTramCount } from "../utils/demoTrams.js";
 
 export default function MapWorkspace({
   stops,
@@ -92,14 +93,9 @@ export default function MapWorkspace({
       />
 
       <div className="map-legend tram-map-legend">
-        <div className="legend-heading"><span>{route?.name || "จุดจอดรถราง"}</span><TrainFront size={15} /></div>
-        <div className="stop-count-large"><strong>{stops.length}</strong><span>จุด</span></div>
-        {route && (
-          <>
-            <div className="tram-route-key"><span style={{ backgroundColor: route.color }} />เส้นทางรถราง</div>
-            <p>ลำดับจุดจอดในเส้นทาง</p>
-          </>
-        )}
+        <div className="legend-heading"><span>รถรางจำลอง</span><TrainFront size={15} /></div>
+        <div className="stop-count-large"><strong>{demoTramCount}</strong><span>คัน</span></div>
+        <p>รถ Demo วิ่งวนอัตโนมัติ</p>
       </div>
 
       <div className="arrival-card tram-arrival-card">
@@ -122,11 +118,11 @@ export default function MapWorkspace({
         </div>
         <div className="tram-arrival-info">
           <Clock3 size={14} />
-          <span>เวลาถึงจะแสดงเมื่อมีข้อมูลตำแหน่งรถและตารางเดินรถ</span>
+          <span>รถราง Demo เคลื่อนที่ตามแนวเส้นทางที่ซ่อนไว้</span>
         </div>
         <div className="tram-arrival-warning">
           <Navigation size={13} />
-          <span>แนวเส้นทางอ้างอิงจากแผนที่ที่ส่งมา ไม่ใช่ข้อมูลติดตามรถ GPS แบบเรียลไทม์</span>
+          <span>ตำแหน่งรถ Demo เป็นการจำลอง ไม่ใช่ GPS รถจริง</span>
         </div>
       </div>
 

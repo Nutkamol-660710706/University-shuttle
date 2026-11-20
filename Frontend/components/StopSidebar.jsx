@@ -9,7 +9,6 @@ import {
 
 export default function StopSidebar({
   stops,
-  route,
   selectedStopNumber,
   onSelectStop,
   isLoading,
@@ -121,9 +120,7 @@ export default function StopSidebar({
           <span>
             <strong>{isLoading ? "กำลังโหลดข้อมูล" : `${stops.length} จุดจอด`}</strong>
             <small>
-              {route
-                ? `เส้นทาง ${route.name}`
-                : "ข้อมูลจุดจอดและเส้นทางจากระบบ"}
+              จุดจอดภายในมหาวิทยาลัย
             </small>
           </span>
         </div>

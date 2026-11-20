@@ -1,18 +1,29 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Locate, LocateFixed } from "lucide-react";
 import {
   Circle,
   CircleMarker,
   MapContainer,
   Marker,
-  Polyline,
   Popup,
   TileLayer,
   useMap,
 } from "react-leaflet";
 import L from "leaflet";
+import {
+  createRouteProfile,
+  getDemoTramPositions,
+} from "../utils/demoTrams.js";
 
 const campusCenter = [13.8190011, 100.0401044];
+const demoTramIcons = Array.from({ length: 5 }, (_, index) =>
+  L.divIcon({
+    className: "demo-tram-marker-wrap",
+    html: `<span class="demo-tram-marker"><span class="demo-tram-label">D${index + 1}</span><span class="demo-tram-car"><span class="demo-tram-window"></span><span class="demo-tram-wheel"></span><span class="demo-tram-wheel"></span></span></span>`,
+    iconSize: [42, 38],
+    iconAnchor: [21, 19],
+  }),
+);
 
 function MapControls({ userLocation }) {
   const map = useMap();
@@ -97,6 +108,33 @@ export default function TramMap({
   userLocation,
   isLocationTracking,
 }) {
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const routeProfile = useMemo(
+    () => createRouteProfile(route?.path),
+    [route?.path],
+  );
+  const demoTrams = useMemo(
+    () => getDemoTramPositions(routeProfile, elapsedSeconds),
+    [elapsedSeconds, routeProfile],
+  );
+
+  useEffect(() => {
+    const startedAt = performance.now();
+    let lastUpdatedAt = 0;
+    let frameId;
+
+    function animate(now) {
+      if (now - lastUpdatedAt >= 100) {
+        setElapsedSeconds((now - startedAt) / 1000);
+        lastUpdatedAt = now;
+      }
+      frameId = requestAnimationFrame(animate);
+    }
+
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
   return (
     <div className="map-frame">
       <MapContainer
@@ -113,30 +151,6 @@ export default function TramMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitStopsBounds stops={stops} />
-        {route && (
-          <>
-            <Polyline
-              positions={route.path}
-              pathOptions={{
-                color: "#435047",
-                weight: 8,
-                opacity: 0.56,
-                lineCap: "round",
-                lineJoin: "round",
-              }}
-            />
-            <Polyline
-              positions={route.path}
-              pathOptions={{
-                color: route.color,
-                weight: 4,
-                opacity: 0.98,
-                lineCap: "round",
-                lineJoin: "round",
-              }}
-            />
-          </>
-        )}
         {stops.map((stop) => (
           <Marker
             key={stop.number}
@@ -153,6 +167,19 @@ export default function TramMap({
             <Popup className="stop-popup">
               <strong>จุด {stop.number}: {stop.name}</strong>
               <span>{stop.position[0]}, {stop.position[1]}</span>
+            </Popup>
+          </Marker>
+        ))}
+        {demoTrams.map((tram) => (
+          <Marker
+            key={tram.id}
+            position={tram.position}
+            icon={demoTramIcons[tram.id - 1]}
+            zIndexOffset={700}
+          >
+            <Popup>
+              <strong>รถราง Demo {tram.id}</strong>
+              <span>ตำแหน่งจำลอง · วิ่งวนตามเส้นทางในระบบ</span>
             </Popup>
           </Marker>
         ))}

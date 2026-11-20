@@ -163,7 +163,6 @@ function App() {
       <section className="workspace">
         <StopSidebar
           stops={stops}
-          route={activeRoute}
           selectedStopNumber={selectedStopNumber}
           onSelectStop={selectStop}
           isLoading={isLoading}
