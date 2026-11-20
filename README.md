@@ -31,9 +31,9 @@ npm run db:setup
 npm run dev
 ```
 
-`npm run db:setup` สร้างตาราง `bus_stops`, `routes`, `route_stops` และ seed ข้อมูลเริ่มต้นจาก `Frontend/data.js` สามารถรันซ้ำเพื่ออัปเดตข้อมูล seed ได้
+`npm run db:setup` สร้างตาราง `bus_stops`, `routes`, `route_stops`, `users` และ `user_locations` พร้อม seed ข้อมูลเริ่มต้นจาก `Frontend/data.js` สามารถรันซ้ำเพื่ออัปเดตข้อมูล seed และ schema ได้
 
-Schema ยังสร้างตาราง `users`, `auth_sms_rate_limits` และ `auth_login_rate_limits` สำหรับสมาชิกและจำกัดการขอ OTP/ลองเข้าสู่ระบบ รหัสผ่านเก็บเป็น bcrypt hash; OTP ตรวจผ่าน Twilio Verify และไม่เก็บรหัส OTP ในฐานข้อมูล
+Schema ยังสร้างตาราง `auth_sms_rate_limits` และ `auth_login_rate_limits` สำหรับจำกัดการขอ OTP/ลองเข้าสู่ระบบ รหัสผ่านเก็บเป็น bcrypt hash; OTP ตรวจผ่าน Twilio Verify และไม่เก็บรหัส OTP ในฐานข้อมูล
 
 `npm run dev` เริ่ม Frontend ที่ Vite และ Backend ที่พอร์ต `3001` พร้อมกัน โดย Vite proxy `/api` ไปยัง Backend
 
@@ -55,11 +55,15 @@ Schema ยังสร้างตาราง `users`, `auth_sms_rate_limits` �
 - `api/` — Vercel Functions สำหรับ API production
 - `Database/schema.sql` — schema ตารางสำหรับ Neon PostgreSQL
 
-API แบบอ่านอย่างเดียว:
+API สำหรับข้อมูลแผนที่:
 
 - `GET /api/stops`
 - `GET /api/routes`
 - `GET /api/health`
+
+สมาชิกที่เข้าสู่ระบบสามารถเปิดการติดตามตำแหน่งได้จากปุ่มบนแผนที่ โดยเบราว์เซอร์จะขออนุญาตก่อน ระบบบันทึกพิกัด GPS ใหม่ลง `user_locations` สูงสุดทุก 30 วินาทีและเขียนทับจุดเดิม ไม่ส่งพิกัดเดิมซ้ำเมื่อไม่มีข้อมูล GPS ใหม่ และไม่เก็บประวัติเส้นทาง; หยุดติดตามหรือสั่งลบพิกัดล่าสุดได้จากหน้าแผนที่ API คือ `GET`, `PUT` และ `DELETE /api/me/location` ข้อมูลจุดล่าสุดยังคงอยู่จนกว่าจะถูกเขียนทับหรือลบ ดังนั้นการคำนวณความหนาแน่นในอนาคตควรนับเฉพาะพิกัดที่อัปเดตใหม่ (เช่น ภายใน 2 นาที) และส่งออกเฉพาะผลรวม ไม่เปิดเผยพิกัดของสมาชิกคนอื่น
+
+หลังอัปเดต schema ให้รัน `npm run db:setup` อีกครั้งเพื่อสร้าง `user_locations` ก่อนเริ่มใช้งาน; เบราว์เซอร์ต้องรองรับ Geolocation และอยู่บน HTTPS (ยกเว้น `localhost`)
 
 ระบบสมาชิกใช้ Username/Password สมัครและเข้าสู่ระบบได้โดยไม่ต้องใช้ OTP เบอร์โทรที่สมัครจะยังไม่ถือว่ายืนยันแล้ว ส่วนการกู้รหัสผ่านยังต้องยืนยัน SMS OTP และตั้งค่าผู้ให้บริการ SMS ก่อน; session เก็บใน HttpOnly cookie:
 

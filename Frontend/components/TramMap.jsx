@@ -1,6 +1,8 @@
-import { useEffect } from "react";
-import { LocateFixed } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Locate, LocateFixed } from "lucide-react";
 import {
+  Circle,
+  CircleMarker,
   MapContainer,
   Marker,
   Polyline,
@@ -12,7 +14,7 @@ import L from "leaflet";
 
 const campusCenter = [13.8190011, 100.0401044];
 
-function MapControls() {
+function MapControls({ userLocation }) {
   const map = useMap();
 
   return (
@@ -24,6 +26,22 @@ function MapControls() {
         −
       </button>
       <span className="map-control-divider" />
+      <button
+        className="map-control locate-control"
+        aria-label="ดูตำแหน่งของฉัน"
+        title="ดูตำแหน่งของฉัน"
+        disabled={!userLocation}
+        onClick={() =>
+          userLocation &&
+          map.flyTo(
+            [userLocation.latitude, userLocation.longitude],
+            Math.max(map.getZoom(), 16),
+            { duration: 0.7 },
+          )
+        }
+      >
+        <Locate size={18} />
+      </button>
       <button
         className="map-control locate-control"
         aria-label="กลับไปยังมหาวิทยาลัยศิลปากร สนามจันทร์"
@@ -49,11 +67,35 @@ function FitStopsBounds({ stops }) {
   return null;
 }
 
+function FocusFirstLocation({ userLocation, isLocationTracking }) {
+  const map = useMap();
+  const focusedDuringTrackingRef = useRef(false);
+
+  useEffect(() => {
+    if (!isLocationTracking) {
+      focusedDuringTrackingRef.current = false;
+      return;
+    }
+    if (!userLocation || focusedDuringTrackingRef.current) return;
+
+    focusedDuringTrackingRef.current = true;
+    map.flyTo(
+      [userLocation.latitude, userLocation.longitude],
+      Math.max(map.getZoom(), 16),
+      { duration: 0.7 },
+    );
+  }, [isLocationTracking, map, userLocation]);
+
+  return null;
+}
+
 export default function TramMap({
   stops,
   route,
   selectedStopNumber,
   onSelectStop,
+  userLocation,
+  isLocationTracking,
 }) {
   return (
     <div className="map-frame">
@@ -114,7 +156,46 @@ export default function TramMap({
             </Popup>
           </Marker>
         ))}
-        <MapControls />
+        {userLocation && (
+          <>
+            {userLocation.accuracyMeters > 0 && (
+              <Circle
+                center={[userLocation.latitude, userLocation.longitude]}
+                radius={userLocation.accuracyMeters}
+                pathOptions={{
+                  color: "#2878d0",
+                  fillColor: "#4b9bf0",
+                  fillOpacity: 0.12,
+                  weight: 1,
+                }}
+              />
+            )}
+            <CircleMarker
+              center={[userLocation.latitude, userLocation.longitude]}
+              radius={8}
+              pathOptions={{
+                color: "#fff",
+                fillColor: "#2878d0",
+                fillOpacity: 1,
+                weight: 3,
+              }}
+            >
+              <Popup>
+                <strong>ตำแหน่งล่าสุดของฉัน</strong>
+                <span>
+                  {userLocation.updatedAt
+                    ? new Date(userLocation.updatedAt).toLocaleString("th-TH")
+                    : "กำลังบันทึกตำแหน่ง"}
+                </span>
+              </Popup>
+            </CircleMarker>
+          </>
+        )}
+        <FocusFirstLocation
+          userLocation={userLocation}
+          isLocationTracking={isLocationTracking}
+        />
+        <MapControls userLocation={userLocation} />
       </MapContainer>
       <div className="map-caption">
         <span className="map-live-dot" />

@@ -669,6 +669,95 @@ button {
   inset: 0;
 }
 
+.location-sharing-panel {
+  position: absolute;
+  z-index: 600;
+  top: 76px;
+  left: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  max-width: 340px;
+  padding: 9px;
+  border: 1px solid #e8edeb;
+  border-radius: 9px;
+  background: #fffffff2;
+  box-shadow: 0 4px 16px #28404018;
+}
+
+.location-sharing-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.location-sharing-copy strong {
+  color: #435766;
+  font-size: 10px;
+}
+
+.location-sharing-copy small {
+  overflow: hidden;
+  color: #829197;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-tracking-button,
+.location-delete-button {
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px solid #dfeae6;
+  border-radius: 7px;
+  background: #eef7f4;
+  color: #137e6d;
+  cursor: pointer;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.location-tracking-button:hover:not(:disabled) {
+  background: #e0f1eb;
+}
+
+.location-tracking-button:disabled {
+  color: #9aa7a7;
+  cursor: not-allowed;
+}
+
+.location-tracking-button.is-tracking {
+  border-color: #f0dfd9;
+  background: #fff3ef;
+  color: #a64f3c;
+}
+
+.location-delete-button {
+  width: 30px;
+  padding: 0;
+  border-color: #f0e2df;
+  background: #fff;
+  color: #a64f3c;
+}
+
+.location-sharing-error,
+.location-sharing-note {
+  grid-column: 1 / -1;
+  color: #a64f3c;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.location-sharing-note {
+  color: #829197;
+}
+
 .tracking-map {
   width: 100%;
   height: 100%;
@@ -840,6 +929,15 @@ button {
 .map-control:hover {
   background: #eef6f4;
   color: #138b78;
+}
+
+.map-control:disabled {
+  color: #b6c0c2;
+  cursor: not-allowed;
+}
+
+.map-control:disabled:hover {
+  background: #fff;
 }
 
 .map-control-divider {
@@ -1241,6 +1339,25 @@ button {
     right: 12px;
     left: 12px;
     gap: 8px;
+  }
+
+  .location-sharing-panel {
+    top: 64px;
+    left: 12px;
+    max-width: min(205px, calc(100% - 155px));
+    gap: 5px;
+    padding: 7px;
+  }
+
+  .location-tracking-button {
+    min-height: 28px;
+    padding: 0 6px;
+    font-size: 8px;
+  }
+
+  .location-delete-button {
+    width: 28px;
+    min-height: 28px;
   }
 
   .mobile-menu-button {

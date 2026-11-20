@@ -69,3 +69,16 @@ CREATE TABLE IF NOT EXISTS auth_login_rate_limits (
   window_started_at TIMESTAMPTZ NOT NULL,
   attempt_count SMALLINT NOT NULL CHECK (attempt_count BETWEEN 1 AND 10)
 );
+
+CREATE TABLE IF NOT EXISTS user_locations (
+  user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  latitude DOUBLE PRECISION NOT NULL CHECK (latitude BETWEEN -90 AND 90),
+  longitude DOUBLE PRECISION NOT NULL CHECK (longitude BETWEEN -180 AND 180),
+  accuracy_meters DOUBLE PRECISION CHECK (
+    accuracy_meters IS NULL OR accuracy_meters >= 0
+  ),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS user_locations_updated_at_idx
+  ON user_locations (updated_at);

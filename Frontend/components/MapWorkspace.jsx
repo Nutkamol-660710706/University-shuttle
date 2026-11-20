@@ -1,9 +1,11 @@
 import {
   Clock3,
+  LocateFixed,
   MapPin,
   Menu,
   Navigation,
   Star,
+  Trash2,
   TrainFront,
 } from "lucide-react";
 import TramMap from "./TramMap.jsx";
@@ -19,7 +21,24 @@ export default function MapWorkspace({
   isLoading,
   hasError,
   onOpenSidebar,
+  isAuthLoading,
+  isAuthenticated,
+  userLocation,
+  isLocationTracking,
+  isLocationLoading,
+  locationError,
+  onStartLocationTracking,
+  onStopLocationTracking,
+  onClearSavedLocation,
 }) {
+  async function handleClearLocation() {
+    try {
+      await onClearSavedLocation();
+    } catch (clearError) {
+      console.error("Unable to delete saved user location:", clearError);
+    }
+  }
+
   return (
     <section className="map-area" aria-label="แผนที่รถรางมหาวิทยาลัยศิลปากร">
       <div className="map-topline">
@@ -43,11 +62,70 @@ export default function MapWorkspace({
         </div>
       </div>
 
+      <div className="location-sharing-panel">
+        <div className="location-sharing-copy">
+          <strong>ตำแหน่งของฉัน</strong>
+          <small>
+            {!isAuthenticated
+              ? isAuthLoading
+                ? "กำลังตรวจสอบบัญชี..."
+                : "เข้าสู่ระบบเพื่อบันทึกตำแหน่ง"
+              : isLocationTracking
+                ? "กำลังติดตาม · อัปเดตสูงสุดทุก 30 วินาที"
+                : isLocationLoading
+                  ? "กำลังโหลดตำแหน่งล่าสุด..."
+                  : userLocation?.updatedAt
+                    ? `บันทึกล่าสุด ${new Date(userLocation.updatedAt).toLocaleString("th-TH")}`
+                    : "ยังไม่มีตำแหน่งที่บันทึก"}
+          </small>
+        </div>
+        {isLocationTracking ? (
+          <button
+            className="location-tracking-button is-tracking"
+            onClick={onStopLocationTracking}
+            type="button"
+          >
+            หยุดติดตาม
+          </button>
+        ) : (
+          <button
+            className="location-tracking-button"
+            onClick={onStartLocationTracking}
+            disabled={!isAuthenticated || isAuthLoading}
+            type="button"
+          >
+            <LocateFixed size={14} />
+            เริ่มติดตาม
+          </button>
+        )}
+        {userLocation && !isLocationTracking && (
+          <button
+            className="location-delete-button"
+            aria-label="ลบตำแหน่งที่บันทึก"
+            title="ลบตำแหน่งที่บันทึก"
+            onClick={handleClearLocation}
+            type="button"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
+        {locationError && (
+          <small className="location-sharing-error" role="alert">
+            {locationError}
+          </small>
+        )}
+        <small className="location-sharing-note">
+          กดเริ่มเพื่อแชร์พิกัดใหม่สูงสุดทุก 30 วินาที ไม่มีประวัติเส้นทาง และลบได้
+        </small>
+      </div>
+
       <TramMap
         stops={stops}
         route={route}
         selectedStopNumber={selectedStopNumber}
         onSelectStop={onSelectStop}
+        userLocation={userLocation}
+        isLocationTracking={isLocationTracking}
       />
 
       <div className="map-legend tram-map-legend">

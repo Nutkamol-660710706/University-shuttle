@@ -5,10 +5,12 @@ import MapWorkspace from "./components/MapWorkspace.jsx";
 import StopSidebar from "./components/StopSidebar.jsx";
 import { useAuth } from "./hooks/useAuth.js";
 import { useTramData } from "./hooks/useTramData.js";
+import { useUserLocation } from "./hooks/useUserLocation.js";
 
 function App() {
   const { stops, routes, isLoading, error, reload } = useTramData();
   const auth = useAuth();
+  const userLocation = useUserLocation(auth.user?.id);
   const [selectedStopNumber, setSelectedStopNumber] = useState(1);
   const [favoriteStops, setFavoriteStops] = useState([4]);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
@@ -100,6 +102,15 @@ function App() {
           isLoading={isLoading}
           hasError={Boolean(error)}
           onOpenSidebar={() => setMobilePanelOpen(true)}
+          isAuthLoading={auth.isLoading}
+          isAuthenticated={Boolean(auth.user)}
+          userLocation={userLocation.location}
+          isLocationTracking={userLocation.isTracking}
+          isLocationLoading={userLocation.isLoading}
+          locationError={userLocation.error}
+          onStartLocationTracking={userLocation.startTracking}
+          onStopLocationTracking={userLocation.stopTracking}
+          onClearSavedLocation={userLocation.clearSavedLocation}
         />
       </section>
       {authMode && (
