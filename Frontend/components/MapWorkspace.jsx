@@ -4,7 +4,6 @@ import {
   Menu,
   Navigation,
   Star,
-  Trash2,
   TrainFront,
 } from "lucide-react";
 import TramMap from "./TramMap.jsx";
@@ -26,17 +25,7 @@ export default function MapWorkspace({
   isLocationTracking,
   isLocationLoading,
   locationError,
-  onStopLocationTracking,
-  onClearSavedLocation,
 }) {
-  async function handleClearLocation() {
-    try {
-      await onClearSavedLocation();
-    } catch (clearError) {
-      console.error("Unable to delete saved user location:", clearError);
-    }
-  }
-
   return (
     <section className="map-area" aria-label="แผนที่รถรางมหาวิทยาลัยศิลปากร">
       <div className="map-topline">
@@ -69,45 +58,27 @@ export default function MapWorkspace({
                 ? "กำลังตรวจสอบบัญชี..."
                 : "เข้าสู่ระบบเพื่อเริ่มติดตามอัตโนมัติ"
               : isLocationTracking
-                ? "กำลังติดตาม · อัปเดตสูงสุดทุก 30 วินาที"
+                ? userLocation
+                  ? `${userLocation.latitude.toFixed(5)}, ${userLocation.longitude.toFixed(5)}`
+                  : "กำลังระบุตำแหน่ง..."
                 : isLocationLoading
                   ? "กำลังโหลดตำแหน่งล่าสุด..."
                   : userLocation?.updatedAt
-                    ? `บันทึกล่าสุด ${new Date(userLocation.updatedAt).toLocaleString("th-TH")}`
+                    ? `${userLocation.latitude.toFixed(5)}, ${userLocation.longitude.toFixed(5)}`
                     : "ยังไม่ได้รับตำแหน่ง"}
           </small>
         </div>
-        {isLocationTracking ? (
-          <button
-            className="location-tracking-button is-tracking"
-            onClick={onStopLocationTracking}
-            type="button"
-          >
-            หยุดติดตาม
-          </button>
-        ) : (
-          <span className="location-tracking-state">
-            {isAuthenticated ? "ไม่ติดตามอยู่" : "เฉพาะสมาชิก"}
-          </span>
-        )}
-        {userLocation && !isLocationTracking && (
-          <button
-            className="location-delete-button"
-            aria-label="ลบตำแหน่งที่บันทึก"
-            title="ลบตำแหน่งที่บันทึก"
-            onClick={handleClearLocation}
-            type="button"
-          >
-            <Trash2 size={14} />
-          </button>
-        )}
         {locationError && (
           <small className="location-sharing-error" role="alert">
             {locationError}
           </small>
         )}
         <small className="location-sharing-note">
-          เฉพาะสมาชิกที่เข้าสู่ระบบ ระบบจะขออนุญาตและเริ่มติดตามอัตโนมัติ หยุดหรือลบตำแหน่งได้
+          {isLocationTracking
+            ? "กำลังแชร์ตำแหน่งล่าสุด · อัปเดตสูงสุดทุก 30 วินาที"
+            : isAuthenticated
+              ? "สถานะและการจัดการตำแหน่งอยู่ในเมนูบัญชี"
+              : "เฉพาะสมาชิกที่เข้าสู่ระบบ · ต้องอนุญาตตำแหน่งในเบราว์เซอร์"}
         </small>
       </div>
 

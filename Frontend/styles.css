@@ -128,6 +128,7 @@ button {
 }
 
 .topbar-actions {
+  position: relative;
   gap: 18px;
 }
 
@@ -156,6 +157,7 @@ button {
   font-family: Manrope, sans-serif;
   font-size: 12px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .workspace {
@@ -706,50 +708,71 @@ button {
   white-space: nowrap;
 }
 
-.location-tracking-button,
-.location-delete-button {
-  display: flex;
-  min-height: 30px;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 0 8px;
-  border: 1px solid #dfeae6;
-  border-radius: 7px;
-  background: #eef7f4;
-  color: #137e6d;
-  cursor: pointer;
-  font-size: 9px;
-  white-space: nowrap;
-}
-
-.location-tracking-button:hover:not(:disabled) {
-  background: #e0f1eb;
-}
-
-.location-tracking-button:disabled {
-  color: #9aa7a7;
-  cursor: not-allowed;
-}
-
-.location-tracking-state {
-  color: #829197;
-  font-size: 8px;
-  white-space: nowrap;
-}
-
-.location-tracking-button.is-tracking {
-  border-color: #f0dfd9;
-  background: #fff3ef;
-  color: #a64f3c;
-}
-
-.location-delete-button {
-  width: 30px;
-  padding: 0;
-  border-color: #f0e2df;
+.account-menu {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  width: min(290px, calc(100vw - 24px));
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid #e8edeb;
+  border-radius: 10px;
   background: #fff;
+  box-shadow: 0 8px 28px #203a4d24;
+}
+
+.account-menu-name {
+  overflow: hidden;
+  color: #334b58;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu-location {
+  display: grid;
+  gap: 3px;
+  padding: 9px;
+  border-radius: 7px;
+  background: #f3f7f5;
+  color: #526a70;
+  font-size: 10px;
+}
+
+.account-menu-location small {
+  color: #829197;
+  font-size: 9px;
+}
+
+.account-menu-action {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 9px;
+  border: 1px solid #e8edeb;
+  border-radius: 7px;
+  background: #fff;
+  color: #526a70;
+  cursor: pointer;
+  font-size: 10px;
+  text-align: left;
+}
+
+.account-menu-action:hover {
+  background: #f3f7f5;
+}
+
+.account-menu-delete,
+.account-menu-logout {
   color: #a64f3c;
+}
+
+.account-menu-error {
+  color: #a64f3c;
+  font-size: 9px;
 }
 
 .location-sharing-error,
@@ -1353,17 +1376,6 @@ button {
     max-width: min(205px, calc(100% - 155px));
     gap: 5px;
     padding: 7px;
-  }
-
-  .location-tracking-button {
-    min-height: 28px;
-    padding: 0 6px;
-    font-size: 8px;
-  }
-
-  .location-delete-button {
-    width: 28px;
-    min-height: 28px;
   }
 
   .mobile-menu-button {

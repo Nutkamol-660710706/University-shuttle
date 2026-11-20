@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { ChevronDown, MapPin, TrainFront } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  MapPin,
+  Pause,
+  Play,
+  Trash2,
+  TrainFront,
+} from "lucide-react";
 import AuthDialog from "./components/auth/AuthDialog.jsx";
 import MapWorkspace from "./components/MapWorkspace.jsx";
 import StopSidebar from "./components/StopSidebar.jsx";
@@ -16,6 +24,7 @@ function App() {
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
   const [authMode, setAuthMode] = useState(null);
   const [accountError, setAccountError] = useState("");
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
   const selectedStop = stops.find((stop) => stop.number === selectedStopNumber);
   const activeRoute = routes[0];
@@ -39,11 +48,35 @@ function App() {
       return;
     }
 
+    setAccountError("");
+    setIsAccountMenuOpen((isOpen) => !isOpen);
+  }
+
+  async function handleSignOut() {
     try {
       await auth.signOut();
       setAccountError("");
+      setIsAccountMenuOpen(false);
     } catch (logoutError) {
       setAccountError(logoutError.message);
+    }
+  }
+
+  async function handleClearLocation() {
+    try {
+      await userLocation.clearSavedLocation();
+      setAccountError("");
+    } catch (clearError) {
+      setAccountError(clearError.message);
+    }
+  }
+
+  function handleLocationTrackingAction() {
+    setAccountError("");
+    if (userLocation.isTracking) {
+      userLocation.stopTracking();
+    } else {
+      userLocation.startTracking();
     }
   }
 
@@ -69,13 +102,61 @@ function App() {
           {auth.user && <span className="member-name">{auth.user.fullName}</span>}
           <button
             className="avatar-button"
-            aria-label={auth.user ? "ออกจากระบบ" : "เข้าสู่ระบบหรือสมัครสมาชิก"}
-            title={auth.user ? "คลิกเพื่อออกจากระบบ" : "เข้าสู่ระบบหรือสมัครสมาชิก"}
+            aria-label={auth.user ? "เปิดเมนูบัญชี" : "เข้าสู่ระบบหรือสมัครสมาชิก"}
+            aria-expanded={auth.user ? isAccountMenuOpen : undefined}
+            aria-haspopup={auth.user ? "true" : undefined}
+            title={auth.user ? "เมนูบัญชี" : "เข้าสู่ระบบหรือสมัครสมาชิก"}
             onClick={handleAccountAction}
             disabled={auth.isLoading}
           >
             {auth.user ? [...auth.user.fullName][0]?.toUpperCase() || "สมาชิก" : "SU"}
           </button>
+          {auth.user && isAccountMenuOpen && (
+            <div className="account-menu" role="region" aria-label="เมนูบัญชี">
+              <strong className="account-menu-name">{auth.user.fullName}</strong>
+              <div className="account-menu-location">
+                <span>ตำแหน่งของฉัน</span>
+                <small>
+                  {userLocation.isTracking
+                    ? "กำลังแชร์ตำแหน่ง"
+                    : userLocation.location?.updatedAt
+                      ? `หยุดแชร์ · บันทึกล่าสุด ${new Date(userLocation.location.updatedAt).toLocaleString("th-TH")}`
+                      : "ยังไม่มีตำแหน่งที่บันทึก"}
+                </small>
+              </div>
+              {userLocation.error && (
+                <small className="account-menu-error" role="alert">
+                  {userLocation.error}
+                </small>
+              )}
+              <button
+                className="account-menu-action"
+                onClick={handleLocationTrackingAction}
+                type="button"
+              >
+                {userLocation.isTracking ? <Pause size={15} /> : <Play size={15} />}
+                {userLocation.isTracking ? "หยุดแชร์ตำแหน่ง" : "เริ่มแชร์อีกครั้ง"}
+              </button>
+              {userLocation.location && !userLocation.isTracking && (
+                <button
+                  className="account-menu-action account-menu-delete"
+                  onClick={handleClearLocation}
+                  type="button"
+                >
+                  <Trash2 size={15} />
+                  ลบตำแหน่งที่บันทึก
+                </button>
+              )}
+              <button
+                className="account-menu-action account-menu-logout"
+                onClick={handleSignOut}
+                type="button"
+              >
+                <LogOut size={15} />
+                ออกจากระบบ
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -108,8 +189,6 @@ function App() {
           isLocationTracking={userLocation.isTracking}
           isLocationLoading={userLocation.isLoading}
           locationError={userLocation.error}
-          onStopLocationTracking={userLocation.stopTracking}
-          onClearSavedLocation={userLocation.clearSavedLocation}
         />
       </section>
       {authMode && (
