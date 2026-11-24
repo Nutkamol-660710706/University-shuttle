@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createRouteProfile,
   demoTramCount,
+  getMockTramDensities,
   getNextDemoTramArrivalSeconds,
   getDemoTramPositions,
   getPositionAtDistance,
@@ -22,6 +23,20 @@ test("places demo trams at evenly spaced points around the loop", () => {
   assert.equal(trams.length, demoTramCount);
   assert.deepEqual(trams[0].position, loop[0]);
   assert.equal(new Set(trams.map(({ position }) => position.join(","))).size, demoTramCount);
+});
+
+test("assigns randomized density categories to each demo tram", () => {
+  const values = [0, 0.34, 0.68, 0.99, 0.5];
+  const densities = getMockTramDensities(() => values.shift());
+
+  assert.deepEqual(densities, [
+    "empty",
+    "moderate",
+    "crowded",
+    "crowded",
+    "moderate",
+  ]);
+  assert.equal(densities.length, demoTramCount);
 });
 
 test("moves demo trams along the route and wraps at the loop end", () => {

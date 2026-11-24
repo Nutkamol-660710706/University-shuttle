@@ -13,9 +13,15 @@ import L from "leaflet";
 import {
   createRouteProfile,
   getDemoTramPositions,
+  getMockTramDensities,
 } from "../utils/demoTrams.js";
 
 export const campusCenter = [13.8190011, 100.0401044];
+const passengerDensityLabels = {
+  empty: "ว่าง",
+  moderate: "ปานกลาง",
+  crowded: "หนาแน่น",
+};
 const demoTramIcons = Array.from({ length: 5 }, (_, index) =>
   L.divIcon({
     className: "demo-tram-marker-wrap",
@@ -127,6 +133,7 @@ export default function TramMap({
   mapRef,
 }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [tramDensities] = useState(() => getMockTramDensities());
   const routeProfile = useMemo(
     () => createRouteProfile(route?.path),
     [route?.path],
@@ -185,27 +192,35 @@ export default function TramMap({
               iconAnchor: [13, 13],
             })}
             eventHandlers={{ click: () => onSelectStop(stop.number) }}
+            title={`จุด ${stop.number}: ${stop.name}`}
             zIndexOffset={selectedStopNumber === stop.number ? 1000 : 0}
           >
             <Popup className="stop-popup">
               <strong>จุด {stop.number}: {stop.name}</strong>
-              <span>{stop.position[0]}, {stop.position[1]}</span>
             </Popup>
           </Marker>
         ))}
-        {demoTrams.map((tram) => (
-          <Marker
-            key={tram.id}
-            position={tram.position}
-            icon={demoTramIcons[tram.id - 1]}
-            zIndexOffset={700}
-          >
-            <Popup>
-              <strong>รถราง Demo {tram.id}</strong>
-              <span>ตำแหน่งจำลอง · วิ่งวนตามเส้นทางในระบบ</span>
-            </Popup>
-          </Marker>
-        ))}
+        {demoTrams.map((tram) => {
+          const density = tramDensities[tram.id - 1];
+          return (
+            <Marker
+              key={tram.id}
+              position={tram.position}
+              icon={demoTramIcons[tram.id - 1]}
+              title={`รถ Demo ${tram.id} · กดเพื่อดูความหนาแน่น`}
+              zIndexOffset={700}
+            >
+              <Popup className="tram-density-popup">
+                <strong>รถราง Demo {tram.id}</strong>
+                <span>ความหนาแน่นผู้โดยสาร</span>
+                <strong className={`tram-density-badge density-${density}`}>
+                  {passengerDensityLabels[density]}
+                </strong>
+                <small>ข้อมูลจำลองแบบสุ่ม ไม่ใช่จำนวนจริง</small>
+              </Popup>
+            </Marker>
+          );
+        })}
         {userLocation && (
           <>
             {userLocation.accuracyMeters > 0 && (

@@ -1,8 +1,19 @@
 export const demoTramCount = 5;
+export const demoPassengerDensityLevels = ["empty", "moderate", "crowded"];
 
 const earthRadiusMeters = 6_371_000;
 const demoSpeedMetersPerSecond = 4;
 const maxStopOffsetMeters = 100;
+
+export function getMockTramDensities(random = Math.random) {
+  return Array.from(
+    { length: demoTramCount },
+    () =>
+      demoPassengerDensityLevels[
+        Math.floor(random() * demoPassengerDensityLevels.length)
+      ],
+  );
+}
 
 function distanceBetween(start, end) {
   const radians = (degrees) => (degrees * Math.PI) / 180;

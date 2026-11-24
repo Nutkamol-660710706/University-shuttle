@@ -101,7 +101,7 @@ export default function MapWorkspace({
         </button>
         <div className="map-data-status">
           <span />
-          {hasError ? "ข้อมูลไม่พร้อม" : isLoading ? "กำลังโหลดข้อมูล" : `มีพิกัด ${stops.length} จุด`}
+          {hasError ? "ข้อมูลไม่พร้อม" : isLoading ? "กำลังโหลดข้อมูล" : `มีป้าย ${stops.length} จุด`}
         </div>
       </div>
 
@@ -115,12 +115,12 @@ export default function MapWorkspace({
                 : "เข้าสู่ระบบเพื่อเริ่มติดตามอัตโนมัติ"
               : isLocationTracking
                 ? userLocation
-                  ? `${userLocation.latitude.toFixed(5)}, ${userLocation.longitude.toFixed(5)}`
+                  ? "กำลังแชร์ตำแหน่งล่าสุด"
                   : "กำลังระบุตำแหน่ง..."
                 : isLocationLoading
                   ? "กำลังโหลดตำแหน่งล่าสุด..."
                   : userLocation?.updatedAt
-                    ? `${userLocation.latitude.toFixed(5)}, ${userLocation.longitude.toFixed(5)}`
+                    ? "มีตำแหน่งล่าสุดที่บันทึกไว้"
                     : "ยังไม่ได้รับตำแหน่ง"}
           </small>
         </div>

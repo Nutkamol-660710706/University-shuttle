@@ -1028,6 +1028,38 @@ button {
   min-width: 140px;
 }
 
+.tram-density-popup .leaflet-popup-content {
+  min-width: 165px;
+  gap: 5px;
+}
+
+.tram-density-badge {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px !important;
+}
+
+.tram-density-badge.density-empty {
+  background: #e7f5ee;
+  color: #268259;
+}
+
+.tram-density-badge.density-moderate {
+  background: #fff4d9;
+  color: #a27519;
+}
+
+.tram-density-badge.density-crowded {
+  background: #fde9e6;
+  color: #b94d3f;
+}
+
+.tram-density-popup .leaflet-popup-content small {
+  color: #829197;
+  font-size: 9px;
+}
+
 .map-controls {
   position: absolute;
   z-index: 500;
