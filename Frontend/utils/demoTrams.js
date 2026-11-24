@@ -2,6 +2,7 @@ export const demoTramCount = 5;
 
 const earthRadiusMeters = 6_371_000;
 const demoSpeedMetersPerSecond = 4;
+const maxStopOffsetMeters = 100;
 
 function distanceBetween(start, end) {
   const radians = (degrees) => (degrees * Math.PI) / 180;
@@ -47,11 +48,61 @@ export function createRouteProfile(path) {
     const end = points[index + 1];
     const length = distanceBetween(start, end);
     if (length === 0) continue;
-    segments.push({ start, end, length });
+    segments.push({ start, end, length, startDistance: totalLength });
     totalLength += length;
   }
 
   return totalLength > 0 ? { segments, totalLength } : null;
+}
+
+function getDistanceAlongRoute(profile, position) {
+  if (
+    !profile?.segments.length ||
+    !Array.isArray(position) ||
+    position.length < 2 ||
+    !Number.isFinite(position[0]) ||
+    !Number.isFinite(position[1])
+  ) {
+    return null;
+  }
+
+  const metersPerDegree = (earthRadiusMeters * Math.PI) / 180;
+  const longitudeScale =
+    metersPerDegree * Math.cos((position[0] * Math.PI) / 180);
+  const targetX = position[1] * longitudeScale;
+  const targetY = position[0] * metersPerDegree;
+  let closestDistance = Infinity;
+  let closestRouteDistance = null;
+
+  for (const segment of profile.segments) {
+    const startX = segment.start[1] * longitudeScale;
+    const startY = segment.start[0] * metersPerDegree;
+    const endX = segment.end[1] * longitudeScale;
+    const endY = segment.end[0] * metersPerDegree;
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const progress = Math.max(
+      0,
+      Math.min(
+        1,
+        ((targetX - startX) * deltaX + (targetY - startY) * deltaY) /
+          (deltaX ** 2 + deltaY ** 2),
+      ),
+    );
+    const nearestPoint = [
+      segment.start[0] + (segment.end[0] - segment.start[0]) * progress,
+      segment.start[1] + (segment.end[1] - segment.start[1]) * progress,
+    ];
+    const distance = distanceBetween(position, nearestPoint);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestRouteDistance =
+        segment.startDistance + segment.length * progress;
+    }
+  }
+
+  return closestDistance <= maxStopOffsetMeters ? closestRouteDistance : null;
 }
 
 export function getPositionAtDistance(profile, distance) {
@@ -82,4 +133,28 @@ export function getDemoTramPositions(profile, elapsedSeconds) {
         (profile.totalLength * index) / demoTramCount,
     ),
   }));
+}
+
+export function getNextDemoTramArrivalSeconds(
+  profile,
+  elapsedSeconds,
+  stopPosition,
+) {
+  const stopDistance = getDistanceAlongRoute(profile, stopPosition);
+  if (stopDistance === null || !Number.isFinite(elapsedSeconds)) return null;
+
+  const secondsPerLoop = profile.totalLength / demoSpeedMetersPerSecond;
+  return Math.min(
+    ...Array.from({ length: demoTramCount }, (_, index) => {
+      const tramDistance =
+        elapsedSeconds * demoSpeedMetersPerSecond +
+        (profile.totalLength * index) / demoTramCount;
+      const distanceUntilStop =
+        ((stopDistance - tramDistance) % profile.totalLength +
+          profile.totalLength) %
+        profile.totalLength;
+      return distanceUntilStop / demoSpeedMetersPerSecond;
+    }),
+    secondsPerLoop,
+  );
 }

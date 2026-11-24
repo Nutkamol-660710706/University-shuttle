@@ -160,6 +160,32 @@ button {
   cursor: pointer;
 }
 
+.topbar-logout-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid #f0d7d4;
+  border-radius: 8px;
+  background: #fff;
+  color: #a64f3c;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.topbar-logout-button:hover:not(:disabled) {
+  background: #fff7f5;
+}
+
+.topbar-logout-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .workspace {
   display: flex;
   min-height: 0;
@@ -783,8 +809,7 @@ button {
   background: #f3f7f5;
 }
 
-.account-menu-delete,
-.account-menu-logout {
+.account-menu-delete {
   color: #a64f3c;
 }
 
@@ -1407,7 +1432,21 @@ button {
   }
 
   .topbar-actions {
-    gap: 0;
+    gap: 8px;
+  }
+
+  .member-name {
+    display: none;
+  }
+
+  .topbar-logout-button {
+    width: 34px;
+    min-width: 34px;
+    padding: 0;
+  }
+
+  .topbar-logout-button span {
+    display: none;
   }
 
   .workspace {
@@ -1836,6 +1875,34 @@ button {
 
 .waiting-stop-summary small,
 .waiting-stop-expiry {
+  color: #829197;
+  font-size: 8px;
+}
+
+.waiting-stop-eta {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 8px;
+  padding: 9px 10px;
+  border: 1px solid #e8edeb;
+  border-radius: 8px;
+  background: #fff;
+  color: #168b78;
+}
+
+.waiting-stop-eta > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.waiting-stop-eta strong {
+  color: #435766;
+  font-size: 9px;
+}
+
+.waiting-stop-eta small {
   color: #829197;
   font-size: 8px;
 }

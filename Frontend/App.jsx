@@ -28,6 +28,7 @@ function App() {
   const [authMode, setAuthMode] = useState(null);
   const [accountError, setAccountError] = useState("");
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const selectedStop = stops.find((stop) => stop.number === selectedStopNumber);
   const activeRoute = routes[0];
@@ -57,12 +58,15 @@ function App() {
   }
 
   async function handleSignOut() {
+    setIsSigningOut(true);
+    setAccountError("");
     try {
       await auth.signOut();
-      setAccountError("");
       setIsAccountMenuOpen(false);
     } catch (logoutError) {
       setAccountError(logoutError.message);
+    } finally {
+      setIsSigningOut(false);
     }
   }
 
@@ -118,6 +122,18 @@ function App() {
           <span className="service-status"><span />รถรางในมหาวิทยาลัย</span>
           {accountError && <span className="account-error" role="alert">{accountError}</span>}
           {auth.user && <span className="member-name">{auth.user.fullName}</span>}
+          {auth.user && (
+            <button
+              className="topbar-logout-button"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              title="ออกจากระบบ"
+              type="button"
+            >
+              <LogOut size={15} />
+              <span>{isSigningOut ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}</span>
+            </button>
+          )}
           <button
             className="avatar-button"
             aria-label={auth.user ? "เปิดเมนูบัญชี" : "เข้าสู่ระบบหรือสมัครสมาชิก"}
@@ -125,7 +141,7 @@ function App() {
             aria-haspopup={auth.user ? "true" : undefined}
             title={auth.user ? "เมนูบัญชี" : "เข้าสู่ระบบหรือสมัครสมาชิก"}
             onClick={handleAccountAction}
-            disabled={auth.isLoading}
+            disabled={auth.isLoading || isSigningOut}
           >
             {auth.user ? [...auth.user.fullName][0]?.toUpperCase() || "สมาชิก" : "SU"}
           </button>
@@ -165,14 +181,6 @@ function App() {
                   ลบตำแหน่งที่บันทึก
                 </button>
               )}
-              <button
-                className="account-menu-action account-menu-logout"
-                onClick={handleSignOut}
-                type="button"
-              >
-                <LogOut size={15} />
-                ออกจากระบบ
-              </button>
             </div>
           )}
         </div>

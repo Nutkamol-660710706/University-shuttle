@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Clock3,
   MapPin,
@@ -10,6 +10,17 @@ import {
   X,
 } from "lucide-react";
 import TramMap, { campusCenter } from "./TramMap.jsx";
+import {
+  createRouteProfile,
+  getNextDemoTramArrivalSeconds,
+} from "../utils/demoTrams.js";
+
+function formatArrivalTime(seconds) {
+  if (seconds === null) return "ยังคำนวณเวลาไม่ได้";
+  if (seconds < 1) return "กำลังถึงป้าย";
+  if (seconds < 60) return `ประมาณ ${Math.ceil(seconds)} วินาที`;
+  return `ประมาณ ${Math.ceil(seconds / 60)} นาที`;
+}
 
 export default function MapWorkspace({
   stops,
@@ -39,6 +50,27 @@ export default function MapWorkspace({
   onSignIn,
 }) {
   const mapRef = useRef(null);
+  const [etaElapsedSeconds, setEtaElapsedSeconds] = useState(0);
+  const routeProfile = useMemo(
+    () => createRouteProfile(route?.path),
+    [route?.path],
+  );
+  const waitingStop = stops.find(({ number }) => number === waitingStopNumber);
+  const arrivalSeconds = waitingStop
+    ? getNextDemoTramArrivalSeconds(
+        routeProfile,
+        etaElapsedSeconds,
+        waitingStop.position,
+      )
+    : null;
+
+  useEffect(() => {
+    const startedAt = performance.now();
+    const intervalId = window.setInterval(() => {
+      setEtaElapsedSeconds((performance.now() - startedAt) / 1000);
+    }, 1000);
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   function focusCampus() {
     mapRef.current?.flyTo(campusCenter, 16, { duration: 0.7 });
@@ -156,6 +188,18 @@ export default function MapWorkspace({
               <small>แจ้งว่ากำลังรอที่ป้ายนี้</small>
             </span>
           </div>
+          {waitingStop && (
+            <div className="waiting-stop-eta" aria-live="polite">
+              <Clock3 size={16} />
+              <span>
+                <strong>รถ Demo คันถัดไปถึงป้ายที่คุณรอ</strong>
+                <small>
+                  {waitingStop.name} · {formatArrivalTime(arrivalSeconds)}
+                </small>
+                <small>เวลาประมาณจากรถจำลอง ไม่ใช่รถจริง</small>
+              </span>
+            </div>
+          )}
           {waitingError && (
             <small className="waiting-stop-error" role="alert">
               {waitingError}

@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createRouteProfile,
   demoTramCount,
+  getNextDemoTramArrivalSeconds,
   getDemoTramPositions,
   getPositionAtDistance,
 } from "../Frontend/utils/demoTrams.js";
@@ -36,6 +37,23 @@ test("moves demo trams along the route and wraps at the loop end", () => {
   assert.deepEqual(
     getPositionAtDistance(profile, -10),
     getPositionAtDistance(profile, profile.totalLength - 10),
+  );
+});
+
+test("estimates the next demo tram arrival at a stop along the route", () => {
+  const profile = createRouteProfile(loop);
+  const stopPosition = getPositionAtDistance(profile, 6);
+
+  assert.equal(
+    getNextDemoTramArrivalSeconds(profile, 0, loop[0]),
+    0,
+  );
+  assert.ok(
+    getNextDemoTramArrivalSeconds(profile, 1, stopPosition) > 0,
+  );
+  assert.equal(
+    getNextDemoTramArrivalSeconds(profile, 0, [0, 0]),
+    null,
   );
 });
 
