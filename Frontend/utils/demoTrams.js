@@ -1,5 +1,10 @@
 export const demoTramCount = 5;
 export const demoPassengerDensityLevels = ["empty", "moderate", "crowded"];
+export const demoPassengerDensityLabels = {
+  empty: "ว่าง",
+  moderate: "ปานกลาง",
+  crowded: "หนาแน่น",
+};
 
 const earthRadiusMeters = 6_371_000;
 const demoSpeedMetersPerSecond = 4;
@@ -146,7 +151,7 @@ export function getDemoTramPositions(profile, elapsedSeconds) {
   }));
 }
 
-export function getNextDemoTramArrivalSeconds(
+export function getNextDemoTramArrival(
   profile,
   elapsedSeconds,
   stopPosition,
@@ -154,18 +159,20 @@ export function getNextDemoTramArrivalSeconds(
   const stopDistance = getDistanceAlongRoute(profile, stopPosition);
   if (stopDistance === null || !Number.isFinite(elapsedSeconds)) return null;
 
-  const secondsPerLoop = profile.totalLength / demoSpeedMetersPerSecond;
-  return Math.min(
-    ...Array.from({ length: demoTramCount }, (_, index) => {
-      const tramDistance =
-        elapsedSeconds * demoSpeedMetersPerSecond +
-        (profile.totalLength * index) / demoTramCount;
-      const distanceUntilStop =
-        ((stopDistance - tramDistance) % profile.totalLength +
-          profile.totalLength) %
-        profile.totalLength;
-      return distanceUntilStop / demoSpeedMetersPerSecond;
-    }),
-    secondsPerLoop,
-  );
+  let nextArrival = null;
+  for (let index = 0; index < demoTramCount; index += 1) {
+    const tramDistance =
+      elapsedSeconds * demoSpeedMetersPerSecond +
+      (profile.totalLength * index) / demoTramCount;
+    const distanceUntilStop =
+      ((stopDistance - tramDistance) % profile.totalLength +
+        profile.totalLength) %
+      profile.totalLength;
+    const seconds = distanceUntilStop / demoSpeedMetersPerSecond;
+
+    if (!nextArrival || seconds < nextArrival.seconds) {
+      nextArrival = { tramId: index + 1, seconds };
+    }
+  }
+  return nextArrival;
 }

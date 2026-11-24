@@ -12,7 +12,9 @@ import {
 import TramMap, { campusCenter } from "./TramMap.jsx";
 import {
   createRouteProfile,
-  getNextDemoTramArrivalSeconds,
+  demoPassengerDensityLabels,
+  getMockTramDensities,
+  getNextDemoTramArrival,
 } from "../utils/demoTrams.js";
 
 function formatArrivalTime(seconds) {
@@ -51,16 +53,20 @@ export default function MapWorkspace({
 }) {
   const mapRef = useRef(null);
   const [etaElapsedSeconds, setEtaElapsedSeconds] = useState(0);
+  const [tramDensities] = useState(() => getMockTramDensities());
   const routeProfile = useMemo(
     () => createRouteProfile(route?.path),
     [route?.path],
   );
-  const arrivalSeconds = selectedStop
-    ? getNextDemoTramArrivalSeconds(
+  const arrival = selectedStop
+    ? getNextDemoTramArrival(
         routeProfile,
         etaElapsedSeconds,
         selectedStop.position,
       )
+    : null;
+  const arrivalDensity = arrival
+    ? tramDensities[arrival.tramId - 1]
     : null;
 
   useEffect(() => {
@@ -145,6 +151,7 @@ export default function MapWorkspace({
         userLocation={userLocation}
         isLocationTracking={isLocationTracking}
         mapRef={mapRef}
+        tramDensities={tramDensities}
       />
 
       {isStopDetailsOpen && (
@@ -191,10 +198,15 @@ export default function MapWorkspace({
             <div className="waiting-stop-eta">
               <Clock3 size={16} />
               <span>
-                <strong>รถ Demo คันถัดไปถึงป้ายนี้</strong>
+                <strong>รถ Demo D{arrival?.tramId ?? "-"} คันถัดไป</strong>
                 <small>
-                  {selectedStop.name} · {formatArrivalTime(arrivalSeconds)}
+                  {selectedStop.name} · {formatArrivalTime(arrival?.seconds ?? null)}
                 </small>
+                {arrivalDensity && (
+                  <small>
+                    ความหนาแน่นผู้โดยสาร: {demoPassengerDensityLabels[arrivalDensity]}
+                  </small>
+                )}
                 <small>เวลาประมาณจากรถจำลอง ไม่ใช่รถจริง</small>
               </span>
             </div>

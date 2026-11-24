@@ -4,7 +4,7 @@ import {
   createRouteProfile,
   demoTramCount,
   getMockTramDensities,
-  getNextDemoTramArrivalSeconds,
+  getNextDemoTramArrival,
   getDemoTramPositions,
   getPositionAtDistance,
 } from "../Frontend/utils/demoTrams.js";
@@ -58,18 +58,15 @@ test("moves demo trams along the route and wraps at the loop end", () => {
 test("estimates the next demo tram arrival at a stop along the route", () => {
   const profile = createRouteProfile(loop);
   const stopPosition = getPositionAtDistance(profile, 6);
+  const arrival = getNextDemoTramArrival(profile, 1, stopPosition);
 
-  assert.equal(
-    getNextDemoTramArrivalSeconds(profile, 0, loop[0]),
-    0,
-  );
-  assert.ok(
-    getNextDemoTramArrivalSeconds(profile, 1, stopPosition) > 0,
-  );
-  assert.equal(
-    getNextDemoTramArrivalSeconds(profile, 0, [0, 0]),
-    null,
-  );
+  assert.deepEqual(getNextDemoTramArrival(profile, 0, loop[0]), {
+    tramId: 1,
+    seconds: 0,
+  });
+  assert.equal(arrival.tramId, 1);
+  assert.ok(arrival.seconds > 0);
+  assert.equal(getNextDemoTramArrival(profile, 0, [0, 0]), null);
 });
 
 test("closes open routes and rejects invalid geometry", () => {

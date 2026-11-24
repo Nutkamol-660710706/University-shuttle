@@ -12,16 +12,11 @@ import {
 import L from "leaflet";
 import {
   createRouteProfile,
+  demoPassengerDensityLabels,
   getDemoTramPositions,
-  getMockTramDensities,
 } from "../utils/demoTrams.js";
 
 export const campusCenter = [13.8190011, 100.0401044];
-const passengerDensityLabels = {
-  empty: "ว่าง",
-  moderate: "ปานกลาง",
-  crowded: "หนาแน่น",
-};
 const demoTramIcons = Array.from({ length: 5 }, (_, index) =>
   L.divIcon({
     className: "demo-tram-marker-wrap",
@@ -131,9 +126,9 @@ export default function TramMap({
   userLocation,
   isLocationTracking,
   mapRef,
+  tramDensities,
 }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [tramDensities] = useState(() => getMockTramDensities());
   const routeProfile = useMemo(
     () => createRouteProfile(route?.path),
     [route?.path],
@@ -214,7 +209,7 @@ export default function TramMap({
                 <strong>รถราง Demo {tram.id}</strong>
                 <span>ความหนาแน่นผู้โดยสาร</span>
                 <strong className={`tram-density-badge density-${density}`}>
-                  {passengerDensityLabels[density]}
+                  {demoPassengerDensityLabels[density]}
                 </strong>
                 <small>ข้อมูลจำลองแบบสุ่ม ไม่ใช่จำนวนจริง</small>
               </Popup>
