@@ -55,12 +55,11 @@ export default function MapWorkspace({
     () => createRouteProfile(route?.path),
     [route?.path],
   );
-  const waitingStop = stops.find(({ number }) => number === waitingStopNumber);
-  const arrivalSeconds = waitingStop
+  const arrivalSeconds = selectedStop
     ? getNextDemoTramArrivalSeconds(
         routeProfile,
         etaElapsedSeconds,
-        waitingStop.position,
+        selectedStop.position,
       )
     : null;
 
@@ -188,13 +187,13 @@ export default function MapWorkspace({
               <small>แจ้งว่ากำลังรอที่ป้ายนี้</small>
             </span>
           </div>
-          {waitingStop && (
-            <div className="waiting-stop-eta" aria-live="polite">
+          {selectedStop && (
+            <div className="waiting-stop-eta">
               <Clock3 size={16} />
               <span>
-                <strong>รถ Demo คันถัดไปถึงป้ายที่คุณรอ</strong>
+                <strong>รถ Demo คันถัดไปถึงป้ายนี้</strong>
                 <small>
-                  {waitingStop.name} · {formatArrivalTime(arrivalSeconds)}
+                  {selectedStop.name} · {formatArrivalTime(arrivalSeconds)}
                 </small>
                 <small>เวลาประมาณจากรถจำลอง ไม่ใช่รถจริง</small>
               </span>
