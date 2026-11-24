@@ -22,6 +22,7 @@ function App() {
   const userLocation = useUserLocation(auth.user?.id);
   const waiting = useWaitingStops(auth.user?.id);
   const [selectedStopNumber, setSelectedStopNumber] = useState(1);
+  const [isStopDetailsOpen, setIsStopDetailsOpen] = useState(true);
   const [favoriteStops, setFavoriteStops] = useState([4]);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
   const [authMode, setAuthMode] = useState(null);
@@ -41,6 +42,7 @@ function App() {
 
   const selectStop = (stopNumber) => {
     setSelectedStopNumber(stopNumber);
+    setIsStopDetailsOpen(true);
     setMobilePanelOpen(false);
   };
 
@@ -193,7 +195,9 @@ function App() {
           route={activeRoute}
           selectedStop={selectedStop}
           selectedStopNumber={selectedStopNumber}
-          onSelectStop={setSelectedStopNumber}
+          onSelectStop={selectStop}
+          isStopDetailsOpen={isStopDetailsOpen}
+          onCloseStopDetails={() => setIsStopDetailsOpen(false)}
           onToggleFavorite={toggleFavorite}
           isFavorite={favoriteStops.includes(selectedStopNumber)}
           isLoading={isLoading}

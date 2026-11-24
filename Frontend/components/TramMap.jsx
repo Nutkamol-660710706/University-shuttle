@@ -78,6 +78,23 @@ function FitStopsBounds({ stops }) {
   return null;
 }
 
+function FocusSelectedStop({ stops, selectedStopNumber }) {
+  const map = useMap();
+  const previousStopNumberRef = useRef(selectedStopNumber);
+
+  useEffect(() => {
+    if (previousStopNumberRef.current === selectedStopNumber) return;
+
+    const stop = stops.find(({ number }) => number === selectedStopNumber);
+    if (!stop) return;
+
+    previousStopNumberRef.current = selectedStopNumber;
+    map.flyTo(stop.position, Math.max(map.getZoom(), 16), { duration: 0.7 });
+  }, [map, selectedStopNumber, stops]);
+
+  return null;
+}
+
 function FocusFirstLocation({ userLocation, isLocationTracking }) {
   const map = useMap();
   const focusedDuringTrackingRef = useRef(false);
@@ -153,6 +170,10 @@ export default function TramMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitStopsBounds stops={stops} />
+        <FocusSelectedStop
+          stops={stops}
+          selectedStopNumber={selectedStopNumber}
+        />
         {stops.map((stop) => (
           <Marker
             key={stop.number}

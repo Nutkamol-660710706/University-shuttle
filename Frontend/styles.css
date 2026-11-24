@@ -1236,6 +1236,15 @@ button {
   cursor: default;
 }
 
+.stop-details-close {
+  color: #8c999d;
+}
+
+.stop-details-close:hover {
+  background: #f3f7f6;
+  color: #435766;
+}
+
 .arrival-destination {
   display: flex;
   align-items: center;
@@ -1779,45 +1788,6 @@ button {
   background: #e7a53d;
 }
 
-.tram-map-legend {
-  width: 176px;
-  align-items: flex-start;
-  padding: 14px;
-}
-
-.tram-map-legend .legend-heading {
-  width: 100%;
-}
-
-.tram-map-legend .legend-heading svg {
-  color: #168b78;
-}
-
-.stop-count-large {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-top: 8px;
-  color: #148975;
-}
-
-.stop-count-large strong {
-  font-family: Manrope, sans-serif;
-  font-size: 30px;
-  line-height: 1;
-}
-
-.stop-count-large span {
-  color: #829197;
-  font-size: 10px;
-}
-
-.tram-map-legend p {
-  margin: 8px 0 0;
-  color: #8a979c;
-  font-size: 9px;
-}
-
 .tram-arrival-card {
   width: 310px;
 }
@@ -1970,11 +1940,6 @@ button {
 
   .map-data-status {
     display: none;
-  }
-
-  .tram-map-legend {
-    width: 137px;
-    padding: 10px;
   }
 
   .tram-arrival-card {

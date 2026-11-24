@@ -7,9 +7,9 @@ import {
   Star,
   TrainFront,
   Users,
+  X,
 } from "lucide-react";
 import TramMap, { campusCenter } from "./TramMap.jsx";
-import { demoTramCount } from "../utils/demoTrams.js";
 
 export default function MapWorkspace({
   stops,
@@ -17,6 +17,8 @@ export default function MapWorkspace({
   selectedStop,
   selectedStopNumber,
   onSelectStop,
+  isStopDetailsOpen,
+  onCloseStopDetails,
   onToggleFavorite,
   isFavorite,
   isLoading,
@@ -114,72 +116,78 @@ export default function MapWorkspace({
         mapRef={mapRef}
       />
 
-      <div className="map-legend tram-map-legend">
-        <div className="legend-heading"><span>รถรางจำลอง</span><TrainFront size={15} /></div>
-        <div className="stop-count-large"><strong>{demoTramCount}</strong><span>คัน</span></div>
-        <p>รถ Demo วิ่งวนอัตโนมัติ</p>
-      </div>
-
-      <div className="arrival-card tram-arrival-card">
-        <div className="arrival-top">
-          <div className="arrival-icon tram-arrival-icon">
-            <TrainFront size={20} />
+      {isStopDetailsOpen && (
+        <div className="arrival-card tram-arrival-card">
+          <div className="arrival-top">
+            <div className="arrival-icon tram-arrival-icon">
+              <TrainFront size={20} />
+            </div>
+            <div className="arrival-title">
+              <span>จุดจอดที่เลือก{selectedStop ? ` · จุด ${selectedStop.number}` : ""}</span>
+              <strong>{selectedStop?.name || (isLoading ? "กำลังโหลด..." : "ไม่มีข้อมูลจุดจอด")}</strong>
+            </div>
+            <button
+              className={`favorite-button ${isFavorite ? "is-favorite" : ""}`}
+              aria-label="บันทึกจุดจอดเป็นรายการโปรด"
+              onClick={() => onToggleFavorite(selectedStopNumber)}
+              disabled={!selectedStop}
+              type="button"
+            >
+              <Star size={17} fill={isFavorite ? "currentColor" : "none"} />
+            </button>
+            <button
+              className="favorite-button stop-details-close"
+              aria-label="ปิดรายละเอียดป้าย"
+              title="ปิดรายละเอียดป้าย"
+              onClick={onCloseStopDetails}
+              type="button"
+            >
+              <X size={17} />
+            </button>
           </div>
-          <div className="arrival-title">
-            <span>จุดจอดที่เลือก{selectedStop ? ` · จุด ${selectedStop.number}` : ""}</span>
-            <strong>{selectedStop?.name || (isLoading ? "กำลังโหลด..." : "ไม่มีข้อมูลจุดจอด")}</strong>
+          <div className="tram-arrival-info">
+            <Clock3 size={14} />
+            <span>รถราง Demo เคลื่อนที่ตามแนวเส้นทางที่ซ่อนไว้</span>
           </div>
+          <div className="waiting-stop-summary" aria-live="polite">
+            <Users size={16} />
+            <span>
+              <strong>{waitingCount} คน</strong>
+              <small>แจ้งว่ากำลังรอที่ป้ายนี้</small>
+            </span>
+          </div>
+          {waitingError && (
+            <small className="waiting-stop-error" role="alert">
+              {waitingError}
+            </small>
+          )}
           <button
-            className={`favorite-button ${isFavorite ? "is-favorite" : ""}`}
-            aria-label="บันทึกจุดจอดเป็นรายการโปรด"
-            onClick={() => onToggleFavorite(selectedStopNumber)}
-            disabled={!selectedStop}
+            className={`waiting-stop-button ${waitingStopNumber === selectedStopNumber ? "is-waiting" : ""}`}
+            onClick={() =>
+              isAuthenticated
+                ? onToggleWaiting(selectedStopNumber)
+                : onSignIn()
+            }
+            disabled={!selectedStop || isWaitingLoading || isUpdatingWaiting}
+            type="button"
           >
-            <Star size={17} fill={isFavorite ? "currentColor" : "none"} />
+            {isUpdatingWaiting
+              ? "กำลังบันทึก..."
+              : waitingStopNumber === selectedStopNumber
+                ? "ยกเลิกการแจ้งว่ากำลังรอ"
+                : !isAuthenticated
+                  ? "เข้าสู่ระบบเพื่อแจ้งว่ากำลังรอ"
+                  : "แจ้งว่ากำลังรอที่ป้ายนี้"}
           </button>
-        </div>
-        <div className="tram-arrival-info">
-          <Clock3 size={14} />
-          <span>รถราง Demo เคลื่อนที่ตามแนวเส้นทางที่ซ่อนไว้</span>
-        </div>
-        <div className="waiting-stop-summary" aria-live="polite">
-          <Users size={16} />
-          <span>
-            <strong>{waitingCount} คน</strong>
-            <small>แจ้งว่ากำลังรอที่ป้ายนี้</small>
-          </span>
-        </div>
-        {waitingError && (
-          <small className="waiting-stop-error" role="alert">
-            {waitingError}
+          <small className="waiting-stop-expiry">
+            สถานะการรอหมดอายุอัตโนมัติภายใน 2 ชั่วโมง
           </small>
-        )}
-        <button
-          className={`waiting-stop-button ${waitingStopNumber === selectedStopNumber ? "is-waiting" : ""}`}
-          onClick={() =>
-            isAuthenticated
-              ? onToggleWaiting(selectedStopNumber)
-              : onSignIn()
-          }
-          disabled={!selectedStop || isWaitingLoading || isUpdatingWaiting}
-          type="button"
-        >
-          {isUpdatingWaiting
-            ? "กำลังบันทึก..."
-            : waitingStopNumber === selectedStopNumber
-              ? "ยกเลิกการแจ้งว่ากำลังรอ"
-              : !isAuthenticated
-                ? "เข้าสู่ระบบเพื่อแจ้งว่ากำลังรอ"
-                : "แจ้งว่ากำลังรอที่ป้ายนี้"}
-        </button>
-        <small className="waiting-stop-expiry">
-          สถานะการรอหมดอายุอัตโนมัติภายใน 2 ชั่วโมง
-        </small>
-        <div className="tram-arrival-warning">
-          <Navigation size={13} />
-          <span>ตำแหน่งรถ Demo เป็นการจำลอง ไม่ใช่ GPS รถจริง</span>
+          <div className="tram-arrival-warning">
+            <Navigation size={13} />
+            <span>ตำแหน่งรถ Demo เป็นการจำลอง ไม่ใช่ GPS รถจริง</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="map-attribution-note">© OpenStreetMap · พิกัดป้ายตามข้อมูลที่ได้รับ</div>
     </section>
