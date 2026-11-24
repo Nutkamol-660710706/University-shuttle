@@ -1645,10 +1645,25 @@ button {
 
 .tram-stop-name {
   overflow: hidden;
+  min-width: 0;
+  flex: 1;
   color: #465c67;
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.stop-waiting-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 3px;
+  color: #71837f;
+  font-size: 9px;
+}
+
+.stop-waiting-count svg {
+  color: #168b78;
 }
 
 .stop-chevron {
@@ -1807,6 +1822,71 @@ button {
 .tram-arrival-info svg {
   flex: 0 0 auto;
   color: #168b78;
+}
+
+.waiting-stop-summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #f0f8f5;
+  color: #168b78;
+}
+
+.waiting-stop-summary > span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.waiting-stop-summary strong {
+  color: #276e61;
+  font-size: 11px;
+}
+
+.waiting-stop-summary small,
+.waiting-stop-expiry {
+  color: #829197;
+  font-size: 8px;
+}
+
+.waiting-stop-button {
+  width: 100%;
+  margin-top: 9px;
+  padding: 8px 10px;
+  border: 1px solid #168b78;
+  border-radius: 7px;
+  background: #168b78;
+  color: #fff;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.waiting-stop-button.is-waiting {
+  border-color: #d3e6e1;
+  background: #fff;
+  color: #47766d;
+}
+
+.waiting-stop-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.waiting-stop-error {
+  display: block;
+  margin-top: 5px;
+  color: #a64e43;
+  font-size: 8px;
+}
+
+.waiting-stop-expiry {
+  display: block;
+  margin-top: 5px;
+  text-align: center;
 }
 
 .tram-arrival-warning {

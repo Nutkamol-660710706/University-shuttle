@@ -82,3 +82,12 @@ CREATE TABLE IF NOT EXISTS user_locations (
 
 CREATE INDEX IF NOT EXISTS user_locations_updated_at_idx
   ON user_locations (updated_at);
+
+CREATE TABLE IF NOT EXISTS user_waiting_stops (
+  user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  stop_id BIGINT NOT NULL REFERENCES bus_stops(id) ON DELETE CASCADE,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS user_waiting_stops_stop_updated_idx
+  ON user_waiting_stops (stop_id, updated_at);

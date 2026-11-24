@@ -5,6 +5,7 @@ import {
   Navigation,
   Star,
   TrainFront,
+  Users,
 } from "lucide-react";
 import TramMap from "./TramMap.jsx";
 import { demoTramCount } from "../utils/demoTrams.js";
@@ -26,6 +27,13 @@ export default function MapWorkspace({
   isLocationTracking,
   isLocationLoading,
   locationError,
+  waitingCount,
+  waitingStopNumber,
+  isWaitingLoading,
+  isUpdatingWaiting,
+  waitingError,
+  onToggleWaiting,
+  onSignIn,
 }) {
   return (
     <section className="map-area" aria-label="แผนที่รถรางมหาวิทยาลัยศิลปากร">
@@ -120,6 +128,39 @@ export default function MapWorkspace({
           <Clock3 size={14} />
           <span>รถราง Demo เคลื่อนที่ตามแนวเส้นทางที่ซ่อนไว้</span>
         </div>
+        <div className="waiting-stop-summary" aria-live="polite">
+          <Users size={16} />
+          <span>
+            <strong>{waitingCount} คน</strong>
+            <small>แจ้งว่ากำลังรอที่ป้ายนี้</small>
+          </span>
+        </div>
+        {waitingError && (
+          <small className="waiting-stop-error" role="alert">
+            {waitingError}
+          </small>
+        )}
+        <button
+          className={`waiting-stop-button ${waitingStopNumber === selectedStopNumber ? "is-waiting" : ""}`}
+          onClick={() =>
+            isAuthenticated
+              ? onToggleWaiting(selectedStopNumber)
+              : onSignIn()
+          }
+          disabled={!selectedStop || isWaitingLoading || isUpdatingWaiting}
+          type="button"
+        >
+          {isUpdatingWaiting
+            ? "กำลังบันทึก..."
+            : waitingStopNumber === selectedStopNumber
+              ? "ยกเลิกการแจ้งว่ากำลังรอ"
+              : !isAuthenticated
+                ? "เข้าสู่ระบบเพื่อแจ้งว่ากำลังรอ"
+                : "แจ้งว่ากำลังรอที่ป้ายนี้"}
+        </button>
+        <small className="waiting-stop-expiry">
+          สถานะการรอหมดอายุอัตโนมัติภายใน 2 ชั่วโมง
+        </small>
         <div className="tram-arrival-warning">
           <Navigation size={13} />
           <span>ตำแหน่งรถ Demo เป็นการจำลอง ไม่ใช่ GPS รถจริง</span>

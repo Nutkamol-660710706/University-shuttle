@@ -4,6 +4,7 @@ import {
   MapPin,
   Search,
   Star,
+  Users,
   X,
 } from "lucide-react";
 
@@ -16,6 +17,7 @@ export default function StopSidebar({
   onRetry,
   isOpen,
   onClose,
+  waitingCounts,
 }) {
   const [search, setSearch] = useState("");
   const [favoriteStops, setFavoriteStops] = useState([4]);
@@ -93,6 +95,13 @@ export default function StopSidebar({
               >
                 <span className="stop-number">{stop.number}</span>
                 <span className="tram-stop-name">{stop.name}</span>
+                <span
+                  className="stop-waiting-count"
+                  title={`มีผู้แจ้งว่ากำลังรอ ${waitingCounts[stop.number] ?? 0} คน`}
+                >
+                  <Users size={13} />
+                  {waitingCounts[stop.number] ?? 0}
+                </span>
                 <span className="stop-chevron">›</span>
               </button>
               <button

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { AuthError } from "../Backend/services/authErrors.js";
 import { validateLocation } from "../Backend/services/locationValidation.js";
+import { validateWaitingStop } from "../Backend/services/waitingStopValidation.js";
 
 test("validates a current location and optional accuracy", () => {
   assert.deepEqual(
@@ -20,6 +21,21 @@ test("validates a current location and optional accuracy", () => {
     validateLocation({ latitude: -90, longitude: 180 }),
     { latitude: -90, longitude: 180, accuracyMeters: null },
   );
+});
+
+test("validates a waiting stop number", () => {
+  assert.equal(validateWaitingStop({ stopNumber: 19 }), 19);
+  for (const body of [
+    { stopNumber: 0 },
+    { stopNumber: 1000 },
+    { stopNumber: "4" },
+    { stopNumber: 1.5 },
+  ]) {
+    assert.throws(
+      () => validateWaitingStop(body),
+      (error) => error instanceof AuthError && error.status === 400,
+    );
+  }
 });
 
 test("rejects invalid coordinates and accuracy values", () => {

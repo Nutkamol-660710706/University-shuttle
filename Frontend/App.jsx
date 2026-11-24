@@ -14,11 +14,13 @@ import StopSidebar from "./components/StopSidebar.jsx";
 import { useAuth } from "./hooks/useAuth.js";
 import { useTramData } from "./hooks/useTramData.js";
 import { useUserLocation } from "./hooks/useUserLocation.js";
+import { useWaitingStops } from "./hooks/useWaitingStops.js";
 
 function App() {
   const { stops, routes, isLoading, error, reload } = useTramData();
   const auth = useAuth();
   const userLocation = useUserLocation(auth.user?.id);
+  const waiting = useWaitingStops(auth.user?.id);
   const [selectedStopNumber, setSelectedStopNumber] = useState(1);
   const [favoriteStops, setFavoriteStops] = useState([4]);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
@@ -77,6 +79,20 @@ function App() {
       userLocation.stopTracking();
     } else {
       userLocation.startTracking();
+    }
+  }
+
+  async function handleToggleWaiting(stopNumber) {
+    if (!auth.user) {
+      setAuthMode("login");
+      return;
+    }
+
+    try {
+      await waiting.toggleWaitingAtStop(stopNumber);
+    } catch (waitingError) {
+      console.error("Unable to update waiting stop:", waitingError);
+      setAccountError(waitingError.message);
     }
   }
 
@@ -168,6 +184,7 @@ function App() {
           isLoading={isLoading}
           error={error}
           onRetry={reload}
+          waitingCounts={waiting.waitingCounts}
           isOpen={mobilePanelOpen}
           onClose={() => setMobilePanelOpen(false)}
         />
@@ -188,6 +205,13 @@ function App() {
           isLocationTracking={userLocation.isTracking}
           isLocationLoading={userLocation.isLoading}
           locationError={userLocation.error}
+          waitingCount={waiting.waitingCounts[selectedStopNumber] ?? 0}
+          waitingStopNumber={waiting.waitingStopNumber}
+          isWaitingLoading={waiting.isLoading}
+          isUpdatingWaiting={waiting.isUpdating}
+          waitingError={waiting.error}
+          onToggleWaiting={handleToggleWaiting}
+          onSignIn={() => setAuthMode("login")}
         />
       </section>
       {authMode && (
