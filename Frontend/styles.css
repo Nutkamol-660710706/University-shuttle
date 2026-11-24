@@ -619,6 +619,24 @@ button {
   background: #fff;
 }
 
+.map-campus-button {
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.map-campus-button:hover {
+  border-color: #b7d9d0;
+  transform: translateY(-1px);
+}
+
+.map-campus-button:focus-visible {
+  outline: 2px solid #168b77;
+  outline-offset: 2px;
+}
+
 .location-icon {
   display: grid;
   width: 31px;

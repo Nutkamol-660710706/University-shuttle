@@ -15,7 +15,7 @@ import {
   getDemoTramPositions,
 } from "../utils/demoTrams.js";
 
-const campusCenter = [13.8190011, 100.0401044];
+export const campusCenter = [13.8190011, 100.0401044];
 const demoTramIcons = Array.from({ length: 5 }, (_, index) =>
   L.divIcon({
     className: "demo-tram-marker-wrap",
@@ -107,6 +107,7 @@ export default function TramMap({
   onSelectStop,
   userLocation,
   isLocationTracking,
+  mapRef,
 }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const routeProfile = useMemo(
@@ -138,6 +139,7 @@ export default function TramMap({
   return (
     <div className="map-frame">
       <MapContainer
+        ref={mapRef}
         center={campusCenter}
         zoom={16}
         minZoom={13}

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
   Clock3,
   MapPin,
@@ -7,7 +8,7 @@ import {
   TrainFront,
   Users,
 } from "lucide-react";
-import TramMap from "./TramMap.jsx";
+import TramMap, { campusCenter } from "./TramMap.jsx";
 import { demoTramCount } from "../utils/demoTrams.js";
 
 export default function MapWorkspace({
@@ -35,6 +36,12 @@ export default function MapWorkspace({
   onToggleWaiting,
   onSignIn,
 }) {
+  const mapRef = useRef(null);
+
+  function focusCampus() {
+    mapRef.current?.flyTo(campusCenter, 16, { duration: 0.7 });
+  }
+
   return (
     <section className="map-area" aria-label="แผนที่รถรางมหาวิทยาลัยศิลปากร">
       <div className="map-topline">
@@ -45,13 +52,19 @@ export default function MapWorkspace({
         >
           <Menu size={19} />
         </button>
-        <div className="map-location">
+        <button
+          className="map-location map-campus-button"
+          onClick={focusCampus}
+          aria-label="กลับไปยังบริเวณมหาวิทยาลัยศิลปากร สนามจันทร์"
+          title="กลับไปยังบริเวณมหาวิทยาลัย"
+          type="button"
+        >
           <span className="location-icon"><MapPin size={17} /></span>
           <span>
             <strong>มหาวิทยาลัยศิลปากร สนามจันทร์</strong>
             <small>อำเภอเมืองนครปฐม จังหวัดนครปฐม</small>
           </span>
-        </div>
+        </button>
         <div className="map-data-status">
           <span />
           {hasError ? "ข้อมูลไม่พร้อม" : isLoading ? "กำลังโหลดข้อมูล" : `มีพิกัด ${stops.length} จุด`}
@@ -98,6 +111,7 @@ export default function MapWorkspace({
         onSelectStop={onSelectStop}
         userLocation={userLocation}
         isLocationTracking={isLocationTracking}
+        mapRef={mapRef}
       />
 
       <div className="map-legend tram-map-legend">
