@@ -28,6 +28,10 @@ test("validates a member profile and normalizes Thai phone numbers", () => {
 
 test("rejects invalid profile values and phone numbers", () => {
   assert.throws(
+    () => validateProfile({ username: "dRiVeR1" }),
+    (error) => error instanceof AuthError && error.status === 400,
+  );
+  assert.throws(
     () => validateProfile({
       username: "bad name",
       fullName: "สมาชิก",

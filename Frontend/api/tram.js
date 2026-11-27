@@ -18,3 +18,7 @@ export function getStops(signal) {
 export function getRoutes(signal) {
   return getCollection("/api/routes", signal);
 }
+
+export function getActiveTramTrips(signal) {
+  return getCollection("/api/trams/active-trips", signal);
+}

@@ -1,5 +1,6 @@
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
+import driverRoutes from "./routes/driverRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import tramRoutes from "./routes/tramRoutes.js";
 import userLocationRoutes from "./routes/userLocationRoutes.js";
@@ -9,6 +10,7 @@ const app = express();
 
 app.use(express.json({ limit: "10kb" }));
 app.use("/api", authRoutes);
+app.use("/api", driverRoutes);
 app.use("/api", userLocationRoutes);
 app.use("/api", waitingStopRoutes);
 app.use("/api", healthRoutes);

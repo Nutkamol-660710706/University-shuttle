@@ -117,6 +117,8 @@ export default function MapWorkspace({
   isFavorite,
   isLoading,
   hasError,
+  activeTripError,
+  activeDriverTrip,
   onOpenSidebar,
   isAuthLoading,
   isAuthenticated,
@@ -206,7 +208,11 @@ export default function MapWorkspace({
         </button>
         <div className="map-data-status">
           <span />
-          {hasError ? "ข้อมูลไม่พร้อม" : isLoading ? "กำลังโหลดข้อมูล" : `มีป้าย ${stops.length} จุด`}
+          {hasError || activeTripError
+            ? "ข้อมูลไม่พร้อม"
+            : isLoading
+              ? "กำลังโหลดข้อมูล"
+              : `มีป้าย ${stops.length} จุด`}
         </div>
       </div>
 
@@ -252,6 +258,7 @@ export default function MapWorkspace({
         isLocationTracking={isLocationTracking}
         mapRef={mapRef}
         tramDensities={tramDensities}
+        activeDriverTrip={activeDriverTrip}
       />
 
       {isStopDetailsOpen && (

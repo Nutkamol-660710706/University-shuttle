@@ -5,6 +5,7 @@ import {
   CircleMarker,
   MapContainer,
   Marker,
+  Polyline,
   Popup,
   TileLayer,
   useMap,
@@ -12,8 +13,10 @@ import {
 import L from "leaflet";
 import {
   createRouteProfile,
+  demoTramSpeedMetersPerSecond,
   demoPassengerDensityLabels,
   getDemoTramPositions,
+  getPositionAtDistance,
 } from "../utils/demoTrams.js";
 
 export const campusCenter = [13.8190011, 100.0401044];
@@ -127,6 +130,8 @@ export default function TramMap({
   isLocationTracking,
   mapRef,
   tramDensities,
+  activeDriverTrip,
+  isDriverView = false,
 }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const routeProfile = useMemo(
@@ -137,6 +142,30 @@ export default function TramMap({
     () => getDemoTramPositions(routeProfile, elapsedSeconds),
     [elapsedSeconds, routeProfile],
   );
+  const activeTripElapsedSeconds = activeDriverTrip
+    ? activeDriverTrip.elapsedSeconds +
+      Math.max(0, (performance.now() - activeDriverTrip.receivedAt) / 1000)
+    : 0;
+  const activeTripPosition = activeDriverTrip
+    ? getPositionAtDistance(
+        routeProfile,
+        activeTripElapsedSeconds * demoTramSpeedMetersPerSecond,
+      )
+    : null;
+  const visibleTrams = isDriverView
+    ? [
+        {
+          id: 1,
+          position:
+            activeTripPosition ??
+            getPositionAtDistance(routeProfile, 0),
+        },
+      ]
+    : demoTrams.map((tram) =>
+        tram.id === activeDriverTrip?.tramNumber && activeTripPosition
+          ? { ...tram, position: activeTripPosition }
+          : tram,
+      );
 
   useEffect(() => {
     const startedAt = performance.now();
@@ -171,6 +200,12 @@ export default function TramMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {isDriverView && route?.path?.length > 1 && (
+          <Polyline
+            positions={route.path}
+            pathOptions={{ color: route.color, opacity: 0.8, weight: 5 }}
+          />
+        )}
         <FitStopsBounds stops={stops} />
         <FocusSelectedStop
           stops={stops}
@@ -195,23 +230,36 @@ export default function TramMap({
             </Popup>
           </Marker>
         ))}
-        {demoTrams.map((tram) => {
+        {visibleTrams.filter((tram) => tram.position).map((tram) => {
           const density = tramDensities[tram.id - 1];
           return (
             <Marker
               key={tram.id}
               position={tram.position}
               icon={demoTramIcons[tram.id - 1]}
-              title={`รถ Demo ${tram.id} · กดเพื่อดูความหนาแน่น`}
+              title={
+                isDriverView
+                  ? `รถหมายเลข ${tram.id} · รถที่คุณขับ`
+                  : `รถ Demo ${tram.id} · กดเพื่อดูความหนาแน่น`
+              }
               zIndexOffset={700}
             >
               <Popup className="tram-density-popup">
-                <strong>รถราง Demo {tram.id}</strong>
-                <span>ความหนาแน่นผู้โดยสาร</span>
-                <strong className={`tram-density-badge density-${density}`}>
-                  {demoPassengerDensityLabels[density]}
-                </strong>
-                <small>ข้อมูลจำลองแบบสุ่ม ไม่ใช่จำนวนจริง</small>
+                {isDriverView ? (
+                  <>
+                    <strong>รถหมายเลข {tram.id}</strong>
+                    <span>{activeDriverTrip ? "กำลังเดินทาง" : "พร้อมเริ่มเดินทาง"}</span>
+                  </>
+                ) : (
+                  <>
+                    <strong>รถราง Demo {tram.id}</strong>
+                    <span>ความหนาแน่นผู้โดยสาร</span>
+                    <strong className={`tram-density-badge density-${density}`}>
+                      {demoPassengerDensityLabels[density]}
+                    </strong>
+                    <small>ข้อมูลจำลองแบบสุ่ม ไม่ใช่จำนวนจริง</small>
+                  </>
+                )}
               </Popup>
             </Marker>
           );
@@ -259,7 +307,9 @@ export default function TramMap({
       </MapContainer>
       <div className="map-caption">
         <span className="map-live-dot" />
-        แผนที่มหาวิทยาลัยศิลปากร วิทยาเขตพระราชวังสนามจันทร์
+        {isDriverView
+          ? "หน้าจอจำลองการเดินทาง · รถหมายเลข 1"
+          : "แผนที่มหาวิทยาลัยศิลปากร วิทยาเขตพระราชวังสนามจันทร์"}
       </div>
     </div>
   );

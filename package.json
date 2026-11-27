@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "node --test",
     "start": "node Backend/index.js",
-    "db:setup": "node Backend/db/setup.js"
+    "db:setup": "node Backend/db/setup.js",
+    "driver:setup": "node Backend/db/setupDriver.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

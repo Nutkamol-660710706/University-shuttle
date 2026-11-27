@@ -5,7 +5,7 @@ import { AuthError } from "./authErrors.js";
 const cookieName = "silpatram_session";
 const sessionLifetimeSeconds = 7 * 24 * 60 * 60;
 
-function getSigningKey() {
+export function getSigningKey() {
   const secret = process.env.AUTH_SECRET;
   if (!secret || Buffer.byteLength(secret, "utf8") < 32) {
     throw new AuthError(503, "ระบบเข้าสู่ระบบยังไม่ได้ตั้งค่า AUTH_SECRET");

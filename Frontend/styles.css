@@ -1131,6 +1131,283 @@ button {
   pointer-events: none;
 }
 
+.driver-page {
+  display: flex;
+  height: 100dvh;
+  min-height: 100vh;
+  flex-direction: column;
+  background: #f5f7f8;
+}
+
+.driver-topbar {
+  z-index: 20;
+  display: flex;
+  height: 68px;
+  flex: 0 0 68px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 27px;
+  border-bottom: 1px solid #e8edef;
+  background: #fff;
+}
+
+.driver-page-label {
+  color: #536773;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.driver-access-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #647781;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.driver-access-link:hover {
+  color: #168b78;
+}
+
+.driver-logout {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid #e8edef;
+  border-radius: 8px;
+  background: #fff;
+  color: #647781;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.driver-dashboard {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+}
+
+.driver-map-shell,
+.driver-map-shell .map-frame {
+  position: absolute;
+  inset: 0;
+}
+
+.driver-status-panel {
+  position: absolute;
+  z-index: 800;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  width: min(320px, calc(100% - 32px));
+  flex-direction: column;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid #e8edeb;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 7px 24px #263b3b1a;
+}
+
+.driver-status-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.driver-status-heading > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.driver-status-heading strong {
+  color: #2e4654;
+  font-size: 12px;
+}
+
+.driver-status-heading small,
+.driver-trip-note {
+  color: #829197;
+  font-size: 9px;
+}
+
+.driver-vehicle-icon,
+.driver-login-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: #e8f4f1;
+  color: #168b78;
+}
+
+.driver-vehicle-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.driver-trip-button {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 7px;
+  background: #168b78;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.driver-trip-button.is-active {
+  background: #b94d43;
+}
+
+.driver-trip-button:disabled,
+.driver-login-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.driver-trip-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.driver-error {
+  color: #a64e43;
+  font-size: 10px;
+}
+
+.driver-map-message,
+.driver-login-state {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  color: #647781;
+  font-size: 13px;
+}
+
+.driver-map-message {
+  position: absolute;
+  z-index: 700;
+  inset: 0;
+  pointer-events: none;
+}
+
+.driver-login-card {
+  width: min(390px, calc(100% - 32px));
+  margin: auto;
+  padding: 28px;
+  border: 1px solid #e8edeb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 35px #263b3b12;
+}
+
+.driver-login-icon {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 17px;
+}
+
+.driver-login-card .eyebrow {
+  margin: 0 0 4px;
+  color: #829197;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.driver-login-card h1 {
+  margin: 0;
+  color: #2e4654;
+  font-size: 20px;
+}
+
+.driver-login-card > p:not(.eyebrow) {
+  margin: 7px 0 18px;
+  color: #829197;
+  font-size: 11px;
+}
+
+.driver-login-form {
+  display: grid;
+  gap: 12px;
+}
+
+.driver-login-form label {
+  display: grid;
+  gap: 5px;
+  color: #536773;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.driver-login-form input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #dfe7e7;
+  border-radius: 7px;
+  outline: none;
+  background: #fff;
+  color: #233a49;
+  font-size: 12px;
+}
+
+.driver-login-form input:focus {
+  border-color: #168b78;
+  box-shadow: 0 0 0 3px #168b7818;
+}
+
+.driver-login-form button {
+  min-height: 40px;
+  margin-top: 3px;
+  border: 0;
+  border-radius: 7px;
+  background: #168b78;
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .driver-access-link span {
+    display: none;
+  }
+
+  .driver-topbar {
+    height: 59px;
+    flex-basis: 59px;
+    padding: 0 12px;
+  }
+
+  .driver-page-label {
+    font-size: 10px;
+  }
+
+  .driver-status-panel {
+    top: auto;
+    right: 12px;
+    bottom: 40px;
+    left: 12px;
+    width: auto;
+  }
+
+  .driver-login-card {
+    padding: 22px;
+  }
+}
+
 .map-live-dot,
 .legend-stops > span {
   width: 7px;

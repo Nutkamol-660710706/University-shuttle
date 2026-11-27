@@ -11,13 +11,21 @@ import {
 import AuthDialog from "./components/auth/AuthDialog.jsx";
 import MapWorkspace from "./components/MapWorkspace.jsx";
 import StopSidebar from "./components/StopSidebar.jsx";
+import DriverPage from "./components/DriverPage.jsx";
 import { useAuth } from "./hooks/useAuth.js";
+import { useActiveTramTrips } from "./hooks/useActiveTramTrips.js";
 import { useTramData } from "./hooks/useTramData.js";
 import { useUserLocation } from "./hooks/useUserLocation.js";
 import { useWaitingStops } from "./hooks/useWaitingStops.js";
 
 function App() {
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  return path === "/driver" ? <DriverPage /> : <PassengerApp />;
+}
+
+function PassengerApp() {
   const { stops, routes, isLoading, error, reload } = useTramData();
+  const { trips: activeTramTrips, error: activeTripError } = useActiveTramTrips();
   const auth = useAuth();
   const userLocation = useUserLocation(auth.user?.id);
   const waiting = useWaitingStops(auth.user?.id);
@@ -32,6 +40,9 @@ function App() {
 
   const selectedStop = stops.find((stop) => stop.number === selectedStopNumber);
   const activeRoute = routes[0];
+  const activeDriverTrip = activeTramTrips.find(
+    (trip) => trip.tramNumber === 1,
+  );
 
   const toggleFavorite = (stopNumber) => {
     setFavoriteStops((current) =>
@@ -120,6 +131,10 @@ function App() {
         </div>
         <div className="topbar-actions">
           <span className="service-status"><span />รถรางในมหาวิทยาลัย</span>
+          <a className="driver-access-link" href="/driver">
+            <TrainFront size={14} />
+            <span>คนขับ</span>
+          </a>
           {accountError && <span className="account-error" role="alert">{accountError}</span>}
           {auth.user && <span className="member-name">{auth.user.fullName}</span>}
           {auth.user && (
@@ -210,6 +225,8 @@ function App() {
           isFavorite={favoriteStops.includes(selectedStopNumber)}
           isLoading={isLoading}
           hasError={Boolean(error)}
+          activeTripError={activeTripError}
+          activeDriverTrip={activeDriverTrip}
           onOpenSidebar={() => setMobilePanelOpen(true)}
           isAuthLoading={auth.isLoading}
           isAuthenticated={Boolean(auth.user)}

@@ -27,9 +27,9 @@ export default function LoginForm({
   return (
     <>
       <div className="auth-heading">
-        <span className="auth-eyebrow">SILPATRAM MEMBER</span>
+        <span className="auth-eyebrow">SILPATRAM ACCESS</span>
         <h2 id="auth-title">เข้าสู่ระบบ</h2>
-        <p>เข้าสู่ระบบเพื่อใช้งานบัญชีสมาชิก</p>
+        <p>บัญชีคนขับจะถูกนำไปยังหน้าคนขับโดยอัตโนมัติ</p>
       </div>
       {notice && <div className="auth-notice" role="status">{notice}</div>}
       {error && <div className="auth-error" role="alert">{error}</div>}

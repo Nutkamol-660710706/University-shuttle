@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import * as authApi from "../api/auth.js";
+import * as driverApi from "../api/driver.js";
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -25,6 +26,15 @@ export function useAuth() {
   }, []);
 
   const signIn = useCallback(async (credentials) => {
+    if (
+      typeof credentials?.username === "string" &&
+      credentials.username.trim().toLowerCase() === "driver1"
+    ) {
+      await driverApi.loginDriver(credentials);
+      window.location.replace("/driver");
+      return null;
+    }
+
     const result = await authApi.login(credentials);
     setUser(result.user);
     return result.user;

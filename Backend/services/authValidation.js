@@ -31,6 +31,9 @@ export function validateProfile(body) {
       "ชื่อผู้ใช้ต้องมี 3–32 ตัว และใช้ได้เฉพาะ a-z, 0-9, จุด, ขีดกลาง หรือขีดล่าง",
     );
   }
+  if (username.toLowerCase() === "driver1") {
+    throw new AuthError(400, "ชื่อผู้ใช้นี้สงวนไว้สำหรับบัญชีคนขับ");
+  }
 
   const fullName = readString(body?.fullName, "ชื่อ", 100);
   const age = Number(body?.age);
