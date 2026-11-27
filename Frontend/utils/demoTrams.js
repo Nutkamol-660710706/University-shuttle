@@ -176,3 +176,19 @@ export function getNextDemoTramArrival(
   }
   return nextArrival;
 }
+
+export function getDemoTravelTimeBetweenStops(
+  profile,
+  startPosition,
+  endPosition,
+) {
+  const startDistance = getDistanceAlongRoute(profile, startPosition);
+  const endDistance = getDistanceAlongRoute(profile, endPosition);
+  if (startDistance === null || endDistance === null) return null;
+
+  const distance =
+    ((endDistance - startDistance) % profile.totalLength +
+      profile.totalLength) %
+    profile.totalLength;
+  return distance / demoSpeedMetersPerSecond;
+}

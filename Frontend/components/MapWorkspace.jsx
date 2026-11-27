@@ -13,6 +13,7 @@ import TramMap, { campusCenter } from "./TramMap.jsx";
 import {
   createRouteProfile,
   demoPassengerDensityLabels,
+  getDemoTravelTimeBetweenStops,
   getMockTramDensities,
   getNextDemoTramArrival,
 } from "../utils/demoTrams.js";
@@ -54,10 +55,22 @@ export default function MapWorkspace({
   const mapRef = useRef(null);
   const [etaElapsedSeconds, setEtaElapsedSeconds] = useState(0);
   const [tramDensities] = useState(() => getMockTramDensities());
+  const [fromStopNumber, setFromStopNumber] = useState(null);
+  const [toStopNumber, setToStopNumber] = useState(null);
   const routeProfile = useMemo(
     () => createRouteProfile(route?.path),
     [route?.path],
   );
+  const fromStop = stops.find((stop) => stop.number === fromStopNumber);
+  const toStop = stops.find((stop) => stop.number === toStopNumber);
+  const tripSeconds =
+    fromStop && toStop && fromStopNumber !== toStopNumber
+      ? getDemoTravelTimeBetweenStops(
+          routeProfile,
+          fromStop.position,
+          toStop.position,
+        )
+      : null;
   const arrival = selectedStop
     ? getNextDemoTramArrival(
         routeProfile,
@@ -68,6 +81,12 @@ export default function MapWorkspace({
   const arrivalDensity = arrival
     ? tramDensities[arrival.tramId - 1]
     : null;
+
+  useEffect(() => {
+    if (stops.length === 0) return;
+    setFromStopNumber((current) => current ?? stops[0].number);
+    setToStopNumber((current) => current ?? stops[1]?.number ?? stops[0].number);
+  }, [stops]);
 
   useEffect(() => {
     const startedAt = performance.now();
@@ -211,6 +230,56 @@ export default function MapWorkspace({
               </span>
             </div>
           )}
+          <div className="trip-estimate">
+            <strong className="trip-estimate-heading">คาดการณ์เวลาเดินทางระหว่างป้าย</strong>
+            <label>
+              <span>จากป้าย</span>
+              <select
+                aria-label="เลือกป้ายต้นทาง"
+                value={fromStopNumber ?? ""}
+                onChange={(event) => setFromStopNumber(Number(event.target.value))}
+                disabled={stops.length === 0}
+              >
+                {stops.map((stop) => (
+                  <option key={stop.number} value={stop.number}>
+                    จุด {stop.number} · {stop.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>ไปยังป้าย</span>
+              <select
+                aria-label="เลือกป้ายปลายทาง"
+                value={toStopNumber ?? ""}
+                onChange={(event) => setToStopNumber(Number(event.target.value))}
+                disabled={stops.length === 0}
+              >
+                {stops.map((stop) => (
+                  <option key={stop.number} value={stop.number}>
+                    จุด {stop.number} · {stop.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {fromStop && toStop && fromStopNumber === toStopNumber ? (
+              <small className="trip-estimate-message">
+                เลือกป้ายต้นทางและปลายทางคนละป้าย
+              </small>
+            ) : tripSeconds === null ? (
+              <small className="trip-estimate-message">
+                ยังไม่มีข้อมูลเส้นทางสำหรับคำนวณ
+              </small>
+            ) : (
+              <div className="trip-estimate-result" aria-live="polite">
+                <Clock3 size={15} />
+                <span>
+                  <strong>ประมาณ {Math.ceil(tripSeconds / 60)} นาที</strong>
+                  <small>เวลาเดินทางตามเส้นทางจำลอง ไม่รวมเวลารอรถ</small>
+                </span>
+              </div>
+            )}
+          </div>
           {waitingError && (
             <small className="waiting-stop-error" role="alert">
               {waitingError}

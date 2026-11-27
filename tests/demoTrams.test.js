@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createRouteProfile,
   demoTramCount,
+  getDemoTravelTimeBetweenStops,
   getMockTramDensities,
   getNextDemoTramArrival,
   getDemoTramPositions,
@@ -67,6 +68,23 @@ test("estimates the next demo tram arrival at a stop along the route", () => {
   assert.equal(arrival.tramId, 1);
   assert.ok(arrival.seconds > 0);
   assert.equal(getNextDemoTramArrival(profile, 0, [0, 0]), null);
+});
+
+test("estimates travel time between stops following the route loop", () => {
+  const profile = createRouteProfile(loop);
+  const start = getPositionAtDistance(profile, 5);
+  const nextStop = getPositionAtDistance(profile, 17);
+  const wrappedStop = getPositionAtDistance(profile, 2);
+
+  assert.ok(
+    Math.abs(getDemoTravelTimeBetweenStops(profile, start, nextStop) - 3) <
+      1e-9,
+  );
+  assert.ok(
+    getDemoTravelTimeBetweenStops(profile, start, wrappedStop) >
+      getDemoTravelTimeBetweenStops(profile, start, nextStop),
+  );
+  assert.equal(getDemoTravelTimeBetweenStops(profile, start, [0, 0]), null);
 });
 
 test("closes open routes and rejects invalid geometry", () => {
