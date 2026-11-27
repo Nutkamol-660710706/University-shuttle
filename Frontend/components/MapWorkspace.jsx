@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -31,6 +31,78 @@ function formatCompactArrivalTime(seconds) {
   if (seconds === null) return "ยังคำนวณเวลาไม่ได้";
   if (seconds < 1) return "รถกำลังถึงป้าย";
   return `อีกประมาณ ${Math.ceil(seconds / 60)} นาที`;
+}
+
+function StopDropdown({ label, stops, value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownId = useId();
+  const dropdownRef = useRef(null);
+  const selectedStop = stops.find((stop) => stop.number === value);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    function closeOnOutsideClick(event) {
+      if (!dropdownRef.current?.contains(event.target)) setIsOpen(false);
+    }
+
+    function closeOnEscape(event) {
+      if (event.key === "Escape") setIsOpen(false);
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isOpen]);
+
+  return (
+    <div className="trip-estimate-dropdown" ref={dropdownRef}>
+      <button
+        className="trip-estimate-dropdown-trigger"
+        type="button"
+        aria-label={label}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls={dropdownId}
+        onClick={() => setIsOpen((open) => !open)}
+        disabled={stops.length === 0}
+      >
+        <span>
+          {selectedStop
+            ? `จุด ${selectedStop.number} · ${selectedStop.name}`
+            : "เลือกป้าย"}
+        </span>
+        <ChevronDown size={14} aria-hidden="true" />
+      </button>
+      {isOpen && (
+        <div
+          className="trip-estimate-dropdown-menu"
+          id={dropdownId}
+          role="listbox"
+          aria-label={label}
+        >
+          {stops.map((stop) => (
+            <button
+              className={`trip-estimate-dropdown-option ${stop.number === value ? "is-selected" : ""}`}
+              key={stop.number}
+              type="button"
+              role="option"
+              aria-selected={stop.number === value}
+              onClick={() => {
+                onChange(stop.number);
+                setIsOpen(false);
+              }}
+            >
+              จุด {stop.number} · {stop.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MapWorkspace({
@@ -276,42 +348,24 @@ export default function MapWorkspace({
           )}
           <div className="trip-estimate">
             <strong className="trip-estimate-heading">คาดการณ์เวลาเดินทางระหว่างป้าย</strong>
-            <label>
+            <div className="trip-estimate-field">
               <span>จากป้าย</span>
-              <div className="trip-estimate-select">
-                <select
-                  aria-label="เลือกป้ายต้นทาง"
-                  value={fromStopNumber ?? ""}
-                  onChange={(event) => setFromStopNumber(Number(event.target.value))}
-                  disabled={stops.length === 0}
-                >
-                  {stops.map((stop) => (
-                    <option key={stop.number} value={stop.number}>
-                      จุด {stop.number} · {stop.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={14} aria-hidden="true" />
-              </div>
-            </label>
-            <label>
+              <StopDropdown
+                label="เลือกป้ายต้นทาง"
+                stops={stops}
+                value={fromStopNumber}
+                onChange={setFromStopNumber}
+              />
+            </div>
+            <div className="trip-estimate-field">
               <span>ไปยังป้าย</span>
-              <div className="trip-estimate-select">
-                <select
-                  aria-label="เลือกป้ายปลายทาง"
-                  value={toStopNumber ?? ""}
-                  onChange={(event) => setToStopNumber(Number(event.target.value))}
-                  disabled={stops.length === 0}
-                >
-                  {stops.map((stop) => (
-                    <option key={stop.number} value={stop.number}>
-                      จุด {stop.number} · {stop.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={14} aria-hidden="true" />
-              </div>
-            </label>
+              <StopDropdown
+                label="เลือกป้ายปลายทาง"
+                stops={stops}
+                value={toStopNumber}
+                onChange={setToStopNumber}
+              />
+            </div>
             {fromStop && toStop && fromStopNumber === toStopNumber ? (
               <small className="trip-estimate-message">
                 เลือกป้ายต้นทางและปลายทางคนละป้าย
