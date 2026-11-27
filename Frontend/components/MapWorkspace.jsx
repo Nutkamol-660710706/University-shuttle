@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  ChevronDown,
+  ChevronUp,
   Clock3,
   MapPin,
   Menu,
@@ -23,6 +25,12 @@ function formatArrivalTime(seconds) {
   if (seconds < 1) return "กำลังถึงป้าย";
   if (seconds < 60) return `ประมาณ ${Math.ceil(seconds)} วินาที`;
   return `ประมาณ ${Math.ceil(seconds / 60)} นาที`;
+}
+
+function formatCompactArrivalTime(seconds) {
+  if (seconds === null) return "ยังคำนวณเวลาไม่ได้";
+  if (seconds < 1) return "รถกำลังถึงป้าย";
+  return `อีกประมาณ ${Math.ceil(seconds / 60)} นาที`;
 }
 
 export default function MapWorkspace({
@@ -54,6 +62,7 @@ export default function MapWorkspace({
 }) {
   const mapRef = useRef(null);
   const [etaElapsedSeconds, setEtaElapsedSeconds] = useState(0);
+  const [isStopDetailsCompact, setIsStopDetailsCompact] = useState(false);
   const [tramDensities] = useState(() => getMockTramDensities());
   const [fromStopNumber, setFromStopNumber] = useState(null);
   const [toStopNumber, setToStopNumber] = useState(null);
@@ -174,7 +183,32 @@ export default function MapWorkspace({
       />
 
       {isStopDetailsOpen && (
-        <div className="arrival-card tram-arrival-card">
+        <div className={`arrival-card tram-arrival-card ${isStopDetailsCompact ? "is-compact" : ""}`}>
+          {isStopDetailsCompact && (
+            <div className="stop-details-compact" aria-live="polite">
+              <Clock3 size={17} />
+              <strong>{formatCompactArrivalTime(arrival?.seconds ?? null)}</strong>
+              <button
+                className="favorite-button"
+                aria-label="ขยายรายละเอียดป้าย"
+                title="ขยายรายละเอียดป้าย"
+                aria-expanded={false}
+                onClick={() => setIsStopDetailsCompact(false)}
+                type="button"
+              >
+                <ChevronUp size={17} />
+              </button>
+              <button
+                className="favorite-button stop-details-close"
+                aria-label="ปิดรายละเอียดป้าย"
+                title="ปิดรายละเอียดป้าย"
+                onClick={onCloseStopDetails}
+                type="button"
+              >
+                <X size={17} />
+              </button>
+            </div>
+          )}
           <div className="arrival-top">
             <div className="arrival-icon tram-arrival-icon">
               <TrainFront size={20} />
@@ -191,6 +225,16 @@ export default function MapWorkspace({
               type="button"
             >
               <Star size={17} fill={isFavorite ? "currentColor" : "none"} />
+            </button>
+            <button
+              className="favorite-button"
+              aria-label="ย่อรายละเอียดป้าย"
+              title="ย่อรายละเอียดป้าย"
+              aria-expanded={true}
+              onClick={() => setIsStopDetailsCompact(true)}
+              type="button"
+            >
+              <ChevronDown size={17} />
             </button>
             <button
               className="favorite-button stop-details-close"

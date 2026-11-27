@@ -1863,6 +1863,32 @@ button {
   width: 310px;
 }
 
+.tram-arrival-card.is-compact {
+  width: max-content;
+  min-width: 205px;
+  max-width: calc(100% - 72px);
+}
+
+.stop-details-compact {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.tram-arrival-card.is-compact > :not(.stop-details-compact) {
+  display: none;
+}
+
+.tram-arrival-card.is-compact .stop-details-compact {
+  display: flex;
+}
+
+.stop-details-compact strong {
+  flex: 1;
+  color: #168b78;
+  font-size: 12px;
+}
+
 .tram-arrival-icon {
   background: #e8f4f1;
   color: #168b78;
