@@ -278,33 +278,39 @@ export default function MapWorkspace({
             <strong className="trip-estimate-heading">คาดการณ์เวลาเดินทางระหว่างป้าย</strong>
             <label>
               <span>จากป้าย</span>
-              <select
-                aria-label="เลือกป้ายต้นทาง"
-                value={fromStopNumber ?? ""}
-                onChange={(event) => setFromStopNumber(Number(event.target.value))}
-                disabled={stops.length === 0}
-              >
-                {stops.map((stop) => (
-                  <option key={stop.number} value={stop.number}>
-                    จุด {stop.number} · {stop.name}
-                  </option>
-                ))}
-              </select>
+              <div className="trip-estimate-select">
+                <select
+                  aria-label="เลือกป้ายต้นทาง"
+                  value={fromStopNumber ?? ""}
+                  onChange={(event) => setFromStopNumber(Number(event.target.value))}
+                  disabled={stops.length === 0}
+                >
+                  {stops.map((stop) => (
+                    <option key={stop.number} value={stop.number}>
+                      จุด {stop.number} · {stop.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={14} aria-hidden="true" />
+              </div>
             </label>
             <label>
               <span>ไปยังป้าย</span>
-              <select
-                aria-label="เลือกป้ายปลายทาง"
-                value={toStopNumber ?? ""}
-                onChange={(event) => setToStopNumber(Number(event.target.value))}
-                disabled={stops.length === 0}
-              >
-                {stops.map((stop) => (
-                  <option key={stop.number} value={stop.number}>
-                    จุด {stop.number} · {stop.name}
-                  </option>
-                ))}
-              </select>
+              <div className="trip-estimate-select">
+                <select
+                  aria-label="เลือกป้ายปลายทาง"
+                  value={toStopNumber ?? ""}
+                  onChange={(event) => setToStopNumber(Number(event.target.value))}
+                  disabled={stops.length === 0}
+                >
+                  {stops.map((stop) => (
+                    <option key={stop.number} value={stop.number}>
+                      จุด {stop.number} · {stop.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={14} aria-hidden="true" />
+              </div>
             </label>
             {fromStop && toStop && fromStopNumber === toStopNumber ? (
               <small className="trip-estimate-message">
